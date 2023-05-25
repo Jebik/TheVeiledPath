@@ -1,4 +1,3 @@
-mod items;
 mod map;
 mod player;
 mod systems;

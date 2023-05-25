@@ -6,16 +6,16 @@ use crate::map::{
 };
 
 pub struct MapManager {
-    tuto_map: Map,
-    level1_map: Map,
+    _tuto_map: Map,
+    _level1_map: Map,
     custom_map: Option<Map>,
 }
 
 impl MapManager {
     pub fn new(tuto_map: MapData, level_map: MapData) -> Result<Self, Box<dyn Error>> {
         Ok(Self {
-            tuto_map: generate_map(tuto_map)?,
-            level1_map: generate_map(level_map)?,
+            _tuto_map: generate_map(tuto_map)?,
+            _level1_map: generate_map(level_map)?,
             custom_map: None,
         })
     }
@@ -95,7 +95,7 @@ impl Map {
         }
     }
 
-    pub (crate) fn at(&self, x: i32, y: i32) -> Option<&Cell> {
+    pub (crate) fn _at(&self, x: i32, y: i32) -> Option<&Cell> {
         // Check if the provided coordinates are within the valid range
         if x >= 0 && x < self.width && y >= 0 && y < self.height {
             // Calculate the index based on the provided x and y coordinates
