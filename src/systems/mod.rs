@@ -1,3 +1,2 @@
-pub struct _Player {
-    pub name: String,
-}
+pub(crate) mod types;
+mod ressource;
