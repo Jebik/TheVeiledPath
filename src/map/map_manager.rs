@@ -8,7 +8,7 @@ use crate::map::{
 pub struct MapManager {
     _tuto_map: Map,
     _level1_map: Map,
-    custom_map: Option<Map>,
+    pub custom_map: Option<Map>,
 }
 
 impl MapManager {

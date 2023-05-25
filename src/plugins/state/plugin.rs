@@ -1,7 +1,7 @@
 use bevy::{prelude::{Plugin, App, PluginGroup, default}, window::{WindowPlugin, WindowMode, WindowPosition, Window}, DefaultPlugins};
 use bevy_egui::EguiPlugin;
 use crate::plugins::menu::plugin::MenuPlugin;
-use super::systems::over_state_system;
+use super::systems::window_resize_system;
 // Menu Plugin
 pub struct StatePlugin;
 
@@ -20,8 +20,7 @@ impl Plugin for StatePlugin {
         }));
         app.add_plugin(EguiPlugin);
         app.add_plugin(MenuPlugin);
-        // Add systems, resources, and setup tasks specific to the menu game state
-        app.add_system(over_state_system);
+        app.add_system(window_resize_system);
         // Add other systems and resources as needed
     }
 }

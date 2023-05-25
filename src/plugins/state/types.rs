@@ -7,6 +7,6 @@ pub enum GameState {
 }
 
 pub struct StateManager {
-    pub(crate) _map_manager: MapManager,
+    pub(crate) map_manager: MapManager,
     pub(crate) _game_state: GameState,
 }

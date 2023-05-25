@@ -22,7 +22,7 @@ fn main() {
     }
 
     let state_manager = StateManager {
-        _map_manager: map_manager,
+        map_manager: map_manager,
         _game_state: GameState::Menu,
     };
 
