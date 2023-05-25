@@ -22,8 +22,8 @@ fn main() {
     }
 
     let state_manager = StateManager {
-        map_manager,
-        game_state: GameState::Menu,
+        _map_manager: map_manager,
+        _game_state: GameState::Menu,
     };
 
     App::new()
