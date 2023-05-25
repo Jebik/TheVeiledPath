@@ -211,3 +211,78 @@ fn setup_grid(
 This will spawn a wall entity with a texture atlas, set its position according to the `Wall` object from the JSON, and set its `VisibleInDimension` component based on the associated dimension. The `update_wall_visibility` system will then take care of changing the wall's visibility based on the `CurrentDimension`.
 
 Remember to change the texture atlas path and grid size in the `load_wall_texture_atlas` function based on your specific texture requirements.
+
+Yes, a simple solution for saving and loading high scores can be implemented using the `serde` and `serde_json` crates that we added to the project earlier. You can easily store high scores as a JSON file.
+
+To save high scores, you can create a structure to hold the necessary information. For example, a `HighScoreEntry` structure with a map name and a score, and another structure `HighScores` that holds a list of `HighScoreEntry`. 
+
+```rust
+#[derive(Serialize, Deserialize, Clone, PartialEq)]
+struct HighScoreEntry {
+    map_name: String,
+    score: u32,
+}
+
+#[derive(Serialize, Deserialize, Clone, PartialEq, Default)]
+struct HighScores {
+    entries: Vec<HighScoreEntry>,
+}
+```
+
+Now, create functions to save and load high scores using `serde_json`:
+
+```rust
+use std::io::{Read, Write};
+use std::fs::{File, OpenOptions};
+
+const HIGH_SCORES_FILE: &str = "highscores.json";
+
+fn save_high_scores(high_scores: &HighScores) {
+    let high_scores_json = serde_json::to_string_pretty(high_scores).expect("Failed to convert to JSON");
+
+    let mut file = OpenOptions::new()
+        .write(true)
+        .create(true)
+        .truncate(true)
+        .open(HIGH_SCORES_FILE)
+        .expect("Failed to open highscores.json file");
+
+    file.write_all(high_scores_json.as_bytes()).expect("Failed to write highscores to file");
+}
+
+fn load_high_scores() -> HighScores {
+    if let Ok(mut file) = File::open(HIGH_SCORES_FILE) {
+        let mut high_scores_json = String::new();
+        file.read_to_string(&mut high_scores_json).expect("Failed to read highscores.json file");
+        serde_json::from_str(&high_scores_json).expect("Failed to parse highscores JSON")
+    } else {
+        HighScores::default()
+    }
+}
+```
+
+With these functions, you can load high scores at the beginning of your game and save them when necessary. For instance, when the player completes a map, update the high scores and save it to the file:
+
+```rust
+fn update_high_scores(map_name: String, new_score: u32) {
+    let mut high_scores = load_high_scores();
+
+    match high_scores.entries.iter_mut().find(|e| e.map_name == map_name) {
+        Some(entry) => {
+            if new_score > entry.score {
+                entry.score = new_score;
+            }
+        }
+        None => {
+            high_scores.entries.push(HighScoreEntry {
+                map_name,
+                score: new_score,
+            });
+        }
+    }
+
+    save_high_scores(&high_scores);
+}
+```
+
+Call the `update_high_scores()` function when the player completes a map to update the high scores. This simple implementation will store the high scores as a JSON file and update them whenever needed.
