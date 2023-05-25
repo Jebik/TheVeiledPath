@@ -1,13 +1,11 @@
 mod map;
 mod player;
 mod plugins;
-mod systems;
 mod game;
 
 use bevy::prelude::*;
 use map::parser::{parse_map, MapSource, MapFile};
-use plugins::menu_plugin::plugin::MenuPlugin;
-use systems::types::{StateManager, GameState};
+use plugins::{types::{StateManager, GameState}, plugin::StatePlugin};
 use std::{env, path::PathBuf};
 
 fn main() {
@@ -30,7 +28,6 @@ fn main() {
 
     App::new()
     .insert_resource::<StateManager>(state_manager)
-    .add_plugins(DefaultPlugins)
-    .add_plugin(MenuPlugin)
+    .add_plugin(StatePlugin)
     .run();
 }
