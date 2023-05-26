@@ -20,7 +20,7 @@ pub fn setup_game(
         },
         LevelChoice::None => panic!("Level Selection to None while going inside GamePlugin")
     };
-    let map = Map::new(level_data);
+    let mut _map = Map::new(level_data);
 
     commands.insert_resource(GameData {
     });
