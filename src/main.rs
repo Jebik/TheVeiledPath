@@ -18,6 +18,7 @@ fn main() {
     // Parse the map.
     let tuto_map = parse_map(MapSource::FileContent(MapFile::Tuto)).expect("Failed to parse the tutorial map");    
     let level_map = parse_map(MapSource::FileContent(MapFile::Level)).expect("Failed to parse the level map");   
+
     let mut map_manager = map::map_manager::MapManager::new(tuto_map, level_map).expect("Failed to create the map manager");
 
     if args.len() > 1 {
