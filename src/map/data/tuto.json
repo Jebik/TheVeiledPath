@@ -1,11 +1,22 @@
 {
     "name": "Tutorial",
-    "size": 16,	
+    "size": 16,
     "start_x": 2,
     "start_y": 4,
     "goal_x": 14,
     "goal_y": 5,
-    "walls": [],
+    "walls": [
+        {
+            "x": 4,
+            "y": 4,
+            "dimension": "Light"
+        },
+        {
+            "x": 4,
+            "y": 4,
+            "dimension": "Dark"
+        }
+    ],
     "doors": [],
     "keys": []
 }
