@@ -1,5 +1,10 @@
 use serde::Deserialize;
-use crate::map::engine_types::Dimension;
+
+#[derive(Deserialize, Clone, Copy)]
+pub enum Dimension {
+    Light,
+    Dark,
+}
 
 #[derive(Deserialize)]
 pub struct MapData {

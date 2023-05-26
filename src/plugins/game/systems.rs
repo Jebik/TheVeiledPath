@@ -1,4 +1,4 @@
-use super::plugin::GameData;
+use super::{map::Map, plugin::GameData};
 use bevy::ecs::system::Commands;
 use crate::plugins::menu::plugin::LevelChoice;
 use crate::map::map_manager::MapManager;
@@ -20,6 +20,7 @@ pub fn setup_game(
         },
         LevelChoice::None => panic!("Level Selection to None while going inside GamePlugin")
     };
+    let map = Map::new(level_data);
 
     commands.insert_resource(GameData {
     });

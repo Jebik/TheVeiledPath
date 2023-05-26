@@ -1,8 +1,7 @@
 use std::path::PathBuf;
 use std::{fs, error::Error, str::FromStr};
 
-use crate::map::engine_types::Dimension;
-use crate::map::json_types::MapData;
+use crate::map::json_types::{Dimension, MapData};
 
 impl FromStr for Dimension {
     type Err = ();
@@ -35,6 +34,11 @@ pub fn parse_map(map_source: MapSource) -> Result<MapData, Box<dyn Error>> {
     };
 
     let data: MapData = serde_json::from_str(&file)?;
+    
+    // Check if the size is a multiple of 16
+    if data.size % 16 != 0 {
+        return Err("Map size must be a multiple of 16".into());
+    }
     Ok(data)
 }
 
