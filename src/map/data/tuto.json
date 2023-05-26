@@ -12,6 +12,21 @@
             "dimension": "Light"
         },
         {
+            "x": 15,
+            "y": 8,
+            "dimension": "Light"
+        },
+        {
+            "x": 15,
+            "y": 4,
+            "dimension": "Light"
+        },
+        {
+            "x": 4,
+            "y": 4,
+            "dimension": "Light"
+        },
+        {
             "x": 4,
             "y": 4,
             "dimension": "Dark"

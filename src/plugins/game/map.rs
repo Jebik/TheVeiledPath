@@ -2,10 +2,6 @@ use bevy::prelude::warn;
 use crate::map::json_types::{Dimension, MapData};
 
 #[derive(PartialEq, Eq)]
-pub struct Wall {
-}
-
-#[derive(PartialEq, Eq)]
 pub struct Door {
     open: bool,
     id: u32,
@@ -18,18 +14,22 @@ pub struct Key {
 
 #[derive(PartialEq, Eq)]
 pub enum ItemType {
-    Wall(Wall),
+    Wall,
     Door(Door),
     Key(Key),
     None,
 }
 
 pub struct Cell {
+    pub x: f32,
+    pub y: f32,
     pub item_type: ItemType
 }
 impl Cell {
-    pub fn new() -> Cell {
+    pub fn new(x: i32, y: i32) -> Cell {
         Cell {
+            x: x as f32,
+            y: y as f32,
             item_type: ItemType::None
         }
     }
@@ -53,10 +53,10 @@ impl Map {
     pub fn new(map_data: &MapData) -> Self {
         let height = (map_data.size / 16) * 9;
         let light_cells = (0..map_data.size)
-            .flat_map(|_x| (0..height).map(move |_y| Cell::new()))
+            .flat_map(|x| (0..height).map(move |y| Cell::new(x, y)))
             .collect();
         let dark_cells = (0..map_data.size)
-            .flat_map(|_x| (0..height).map(move |_y| Cell::new()))
+            .flat_map(|x| (0..height).map(move |y| Cell::new(x, y)))
             .collect();
 
         let mut map = Map {
@@ -92,10 +92,10 @@ impl Map {
     pub fn get_mut_cell(&mut self, x: i32, y: i32, dimension: Dimension) -> Option<&mut Cell> {
         match dimension {
             Dimension::Light => {
-                self.light_cells.get_mut((y * self.width + x) as usize)
+                self.light_cells.get_mut((x * self.height + y) as usize)
             },
             Dimension::Dark => {
-                self.dark_cells.get_mut((y * self.width + x) as usize)
+                self.dark_cells.get_mut((x * self.height + y) as usize)
             },
         }
     }
@@ -107,7 +107,7 @@ fn generate_map(map_data: &MapData, map: &mut Map) {
     // Iterate over the walls and add them to the corresponding cells
     for wall in &map_data.walls {
         if let Some(cell) = map.get_mut_cell(wall.x, wall.y, wall.dimension) {
-            cell.set_data(ItemType::Wall(Wall {}));
+            cell.set_data(ItemType::Wall);
         } else {
             warn!("Parse Map Wall in invalid position: ({}, {})", wall.x, wall.y);
         }
