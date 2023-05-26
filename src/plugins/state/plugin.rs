@@ -16,7 +16,6 @@ impl Plugin for StatePlugin {
                 title: "The Veiled Path".into(),
                 position: WindowPosition::At((30,30).into()),
                 resolution: (1600., 900.).into(),
-                resizable: false,
                 mode: WindowMode::Windowed,
                 ..default()
             }),
