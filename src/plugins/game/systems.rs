@@ -1,8 +1,8 @@
-use super::{map::Map, plugin::GameData};
 use bevy::ecs::system::Commands;
 use crate::plugins::menu::plugin::LevelChoice;
 use crate::map::map_manager::MapManager;
 use bevy::ecs::system::Res;
+use super::engine::GameData;
 
 pub fn setup_game(
     mut commands: Commands,
@@ -20,8 +20,5 @@ pub fn setup_game(
         },
         LevelChoice::None => panic!("Level Selection to None while going inside GamePlugin")
     };
-    let mut _map = Map::new(level_data);
-
-    commands.insert_resource(GameData {
-    });
+    commands.insert_resource(GameData::new(level_data));
 }
