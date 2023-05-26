@@ -1,6 +1,8 @@
-use bevy::prelude::Res;
-use crate::plugins::state::types::StateManager;
+use super::plugin::GameData;
+use bevy::ecs::system::Commands;
 
-pub fn game_state_system(_state_manager: Res<StateManager>) {
-    // Logic and rendering for the game state
+pub fn setup_game(mut commands: Commands) {
+
+    commands.insert_resource(GameData {
+    });
 }

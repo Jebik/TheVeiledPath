@@ -1,12 +1,13 @@
-use crate::map::map_manager::MapManager;
+use bevy::prelude::States;
 
+#[derive(States, Debug, Hash, Eq, PartialEq, Clone)]
 pub enum GameState {
     Menu,
-    _Game,
+    Game,
     _GameOver,
 }
-
-pub struct StateManager {
-    pub(crate) map_manager: MapManager,
-    pub(crate) _game_state: GameState,
+impl Default for GameState {
+    fn default() -> Self {
+        GameState::Menu
+    }
 }

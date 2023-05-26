@@ -1,5 +1,3 @@
-use super::types::StateManager;
-use bevy::ecs::system::Resource;
 use bevy::prelude::{EventReader, info};
 use bevy::window::{WindowResized};
 
@@ -8,5 +6,3 @@ pub fn window_resize_system(mut resize_reader: EventReader<WindowResized>) {
         info!("Window was resized to {} x {}", e.width, e.height);
     }
 }
-
-impl Resource for StateManager {}

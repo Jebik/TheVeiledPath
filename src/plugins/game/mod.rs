@@ -1,2 +1,2 @@
-mod plugin;
+pub mod plugin;
 mod systems;

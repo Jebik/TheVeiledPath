@@ -5,8 +5,12 @@ mod game;
 
 use bevy::prelude::*;
 use map::parser::{parse_map, MapSource, MapFile};
-use plugins::{types::{StateManager, GameState}, plugin::StatePlugin};
+use plugins::plugin::StatePlugin;
+use map::map_manager::MapManager;
 use std::{env, path::PathBuf};
+
+
+impl Resource for MapManager {}
 
 fn main() {
     // Get the command line arguments.
@@ -21,13 +25,8 @@ fn main() {
         map_manager.set_custom_map(custom_map);
     }
 
-    let state_manager = StateManager {
-        map_manager: map_manager,
-        _game_state: GameState::Menu,
-    };
-
     App::new()
-    .insert_resource::<StateManager>(state_manager)
+    .insert_resource::<MapManager>(map_manager)
     .add_plugin(StatePlugin)
     .run();
 }
