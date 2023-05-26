@@ -10,6 +10,10 @@ pub enum Dimension {
 pub struct MapData {
     pub name: String,
     pub size: i32,
+    pub start_x: i32,
+    pub start_y: i32,
+    pub goal_x: i32,
+    pub goal_y: i32,
     pub walls: Vec<Wall>,
     pub doors: Vec<Door>,
     pub keys: Vec<Key>,

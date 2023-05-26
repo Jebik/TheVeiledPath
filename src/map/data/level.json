@@ -1,6 +1,10 @@
 {
     "name": "Level 1",
     "size": 48,	
+    "start_x": 2,
+    "start_y": 2,
+    "goal_x": 48,
+    "goal_y": 2,
     "walls": [],
     "doors": [],
     "keys": []
