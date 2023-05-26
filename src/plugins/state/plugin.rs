@@ -3,6 +3,7 @@ use bevy_egui::EguiPlugin;
 use crate::plugins::menu::plugin::MenuPlugin;
 use crate::plugins::game::plugin::GamePlugin;
 use crate::plugins::over::plugin::OverPlugin;
+use crate::plugins::input::plugin::InputPlugin;
 use super::types::GameState;
 use super::systems::window_resize_system;
 // Menu Plugin
@@ -23,6 +24,7 @@ impl Plugin for StatePlugin {
         }));
         app.add_state::<GameState>();
         app.add_plugin(EguiPlugin);
+        app.add_plugin(InputPlugin);
         app.add_plugin(MenuPlugin);
         app.add_plugin(GamePlugin);
         app.add_plugin(OverPlugin);

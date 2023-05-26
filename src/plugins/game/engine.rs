@@ -9,7 +9,10 @@ pub struct Player {
 }
 impl Player {
     fn new(level_data: &MapData) -> Player {
-        todo!()
+        Player { 
+            x: level_data.start_x as f32 + 0.5,
+            y: level_data.start_y as f32 + 0.5
+        }
     }
 }
 
