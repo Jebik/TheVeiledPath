@@ -22,9 +22,9 @@ impl Player {
 
 #[derive(Resource)]
 pub struct GameData {
-    map: Map,
-    player: Player,
-    dimensions: Dimension,
+    pub map: Map,
+    pub player: Player,
+    pub dimensions: Dimension,
 }
 
 impl GameData {

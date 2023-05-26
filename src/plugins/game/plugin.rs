@@ -1,4 +1,4 @@
-use bevy::prelude::{Plugin, App, IntoSystemAppConfig, IntoSystemConfig};
+use bevy::prelude::{Plugin, App, IntoSystemConfig, IntoSystemAppConfig};
 use bevy::ecs::schedule::{OnEnter,OnUpdate};
 use super::systems::setup_game;
 use super::input::{setup_input, move_system};
