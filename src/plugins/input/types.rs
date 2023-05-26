@@ -1,4 +1,4 @@
-use bevy::{prelude::{Resource, KeyCode, GamepadAxisType, GamepadButtonType, Gamepad}, utils::HashMap};
+use bevy::{prelude::{Resource, KeyCode, GamepadAxisType, GamepadButtonType}, utils::HashMap};
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum Action {
@@ -26,6 +26,3 @@ pub struct InputData {
     pub button_x: bool,
     pub button_y: bool,
 }
-
-#[derive(Resource)]
-pub struct MyGamepad(pub Gamepad);

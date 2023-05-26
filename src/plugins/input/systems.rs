@@ -1,43 +1,15 @@
 //use bevy::prelude::*;
-use bevy::input::gamepad::{GamepadAxis, GamepadButton, GamepadEvent, GamepadConnectionEvent, GamepadConnection};
-use bevy::prelude::{Axis, Commands, EventReader, Input, KeyCode, Res, ResMut};
-use super::types::{InputData, InputMap, Action, MyGamepad};
-
-pub fn gamepad_connections(
-    mut commands: Commands,
-    my_gamepad: Option<Res<MyGamepad>>,
-    mut gamepad_evr: EventReader<GamepadEvent>,
-) {
-    for ev in gamepad_evr.iter() {
-        match ev {
-            GamepadEvent::Connection(GamepadConnectionEvent { gamepad, connection }) => {
-                match connection {
-                    GamepadConnection::Connected(_) => {
-                        if my_gamepad.is_none() {
-                            commands.insert_resource(MyGamepad(*gamepad));
-                        }
-                    },
-                    GamepadConnection::Disconnected => {
-                        if let Some(MyGamepad(old_id)) = my_gamepad.as_deref() {
-                            if *old_id == *gamepad {
-                                commands.remove_resource::<MyGamepad>();
-                            }
-                        }
-                    },
-                }
-            },
-            _ => (),
-        }
-    }
-}
+use bevy::input::gamepad::{GamepadAxis, GamepadButton};
+use bevy::prelude::{Axis, Input, KeyCode, Res, ResMut, Gamepads};
+use super::types::{InputData, InputMap, Action};
 
 pub fn handle_input_system(
     keyboard_input: Res<Input<KeyCode>>,
     axes: Res<Axis<GamepadAxis>>,
     buttons: Res<Input<GamepadButton>>,
-    my_gamepad: Option<Res<MyGamepad>>,
     mut input_data: ResMut<InputData>,
     input_map: Res<InputMap>,
+    gamepads: Res<Gamepads>,
 ) {
     // Reset input data
     *input_data = InputData::default();
@@ -68,9 +40,7 @@ pub fn handle_input_system(
     }
 
     // Handle gamepad inputs
-    if let Some(gp) = my_gamepad {
-        let gamepad = gp.0;
-
+    if let Some(gamepad) = gamepads.iter().next() {
         for (axis_type, action) in input_map.gamepad_axis_map.iter() {
             let gamepad_axis = GamepadAxis {
                 gamepad,
