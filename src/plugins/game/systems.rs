@@ -1,27 +1,23 @@
-use super::engine::GameData;
+use super::{engine::GameData, dimension::{init_dimension_world, init_dimension, DimensionHandle}};
 use crate::{
-    map::map_manager::MapManager,
+    map::{json_types::Dimension, map_manager::MapManager},
     plugins::{
-        game::{engine::SizeDate, map::ItemType},
+        game::{engine::SizeDate},
         menu::plugin::LevelChoice,
     },
 };
 use bevy::{
-    core_pipeline::clear_color::ClearColorConfig,
     ecs::system::{Commands, Res},
     prelude::{
-        default, info, shape, Assets, Camera2dBundle, Color, Component, EventReader, Handle, Image,
-        Mesh, ResMut, Resource, Transform, Vec2, Vec3, Query, Entity, With,
+        default, info, shape, Assets, Camera2dBundle, Component, EventReader, Image, Mesh, Query, ResMut, Vec2, With,
     },
     render::{
-        camera::RenderTarget,
         render_resource::{
             Extent3d, TextureDescriptor, TextureDimension, TextureFormat, TextureUsages,
         },
-        view::RenderLayers,
     },
     sprite::{ColorMaterial, MaterialMesh2dBundle, Mesh2dHandle},
-    window::{WindowResized, Window},
+    window::{Window, WindowResized},
 };
 
 pub fn setup_game(
@@ -65,30 +61,12 @@ pub fn setup_game(
     commands.insert_resource(size_data);
 }
 
-#[derive(Resource)]
-pub struct DimensionTexture {
-    light: Handle<Image>,
-    dark: Handle<Image>,
-}
-
-#[derive(Component)]
-pub struct OriginalPosition(pub Vec2);
 #[derive(Component)]
 pub struct PlayerPosition;
 #[derive(Component)]
 pub struct FullScreen;
 
-pub fn init_world(
-    commands: &mut Commands,
-    materials: &mut Assets<ColorMaterial>,
-    images: &mut Assets<Image>,
-    meshes: &mut Assets<Mesh>,
-    game_data: &mut GameData,
-    size_data: &SizeDate,
-) {
-    let l_color = Color::rgb(0.95, 0.95, 0.95);
-    let b_color = Color::rgb(0.05, 0.05, 0.05);
-
+pub fn init_target() -> Image {
     let size = Extent3d {
         width: 1600,
         height: 900,
@@ -112,68 +90,52 @@ pub fn init_world(
     };
     // fill image.data with zeroes
     image.resize(size);
+    return image;
+}
 
-    let light_handle = images.add(image.clone());
-    let dark_handle = images.add(image);
+pub fn init_world(
+    commands: &mut Commands,
+    materials: &mut Assets<ColorMaterial>,
+    images: &mut Assets<Image>,
+    meshes: &mut Assets<Mesh>,
+    game_data: &mut GameData,
+    size_data: &SizeDate,
+) {
+    let image = init_target();
+    let dimension_handle = init_dimension(images, image);
 
-    let dimension_texture = DimensionTexture {
-        light: light_handle.clone(),
-        dark: dark_handle.clone(),
-    };
-
-    // Spawn the light camera
-    let light_layer = RenderLayers::layer(1);
-    let mut light_camera = Camera2dBundle::default();
-    light_camera.camera.target = RenderTarget::Image(light_handle.clone());
-    light_camera.camera_2d.clear_color = ClearColorConfig::Custom(l_color);
-    commands.spawn((light_camera, light_layer));
-
-    // Spawn the dark camera
-    let dark_layer = RenderLayers::layer(2);
-    let mut dark_camera = Camera2dBundle::default();
-    dark_camera.camera.target = RenderTarget::Image(dark_handle.clone());
-    dark_camera.camera_2d.clear_color = ClearColorConfig::Custom(b_color);
-    commands.spawn((dark_camera, dark_layer));
-
-    // Spawn the player
-    spawn_player(
-        commands,
+    init_dimension_world(
+        Dimension::Light,
+        &dimension_handle,
+        game_data,
         size_data,
+        commands,
         materials,
         meshes,
-        light_layer,
-        dark_layer,
-        Vec2::new(game_data.player.x, game_data.player.y),
+    );
+    init_dimension_world(
+        Dimension::Dark,
+        &dimension_handle,
+        game_data,
+        size_data,
+        commands,
+        materials,
+        meshes,
     );
 
-    for cell in &game_data.map.light_cells {
-        if cell.item_type == ItemType::Wall {
-            let position = Vec2::new(cell.x, cell.y);
-            spawn_quad(
-                commands, &size_data, b_color, materials, meshes, light_layer, position,
-            );
-        }
-    }
-    for cell in &game_data.map.dark_cells {
-        if cell.item_type == ItemType::Wall {
-            let position = Vec2::new(cell.x, cell.y);
-            spawn_quad(
-                commands, &size_data, l_color, materials, meshes, dark_layer, position,
-            );
-        }
-    }
-
-    spawn_full_screen_quad(commands, &size_data, materials, meshes, dark_handle);
-    commands.insert_resource(dimension_texture)
+    spawn_full_screen_quad(commands, size_data, game_data, materials, meshes, &dimension_handle);
+    commands.insert_resource(dimension_handle)
 }
 
 fn spawn_full_screen_quad(
     commands: &mut Commands,
     size_data: &SizeDate,
+    game_data: &GameData,
     materials: &mut Assets<ColorMaterial>,
     meshes: &mut Assets<Mesh>,
-    image_handle: Handle<Image>,
+    dimension: &DimensionHandle,
 ) {
+    let image_handle = dimension.get_image_handle(game_data.dimension);
     let camera = Camera2dBundle::default();
     commands.spawn(camera);
 
@@ -191,89 +153,19 @@ fn spawn_full_screen_quad(
         }))
         .into();
 
-    commands.spawn(MaterialMesh2dBundle {
-        mesh: mesh,
-        material: material_handle,
-        ..default()
-    }).insert(FullScreen);
-}
-
-fn spawn_player(
-    commands: &mut Commands,
-    size_date: &SizeDate,
-    materials: &mut Assets<ColorMaterial>,
-    meshes: &mut Assets<Mesh>,
-    light_layer: RenderLayers,
-    dark_layer: RenderLayers,
-    position: Vec2,
-) {
-    let l_color = Color::rgb(0.95, 0.95, 0.95);
-    let b_color = Color::rgb(0.05, 0.05, 0.05);
-    // Calculate the position of the quad relative to the window size
-    let quad_x = size_date.get_world_x(position.x);
-    let quad_y = size_date.get_world_y(position.y);
-
     commands
         .spawn(MaterialMesh2dBundle {
-            mesh: meshes.add(Mesh::from(shape::Circle::default())).into(),
-            transform: Transform::from_xyz(quad_x, quad_y, 0.).with_scale(Vec3::new(
-                size_date.quad_width * 0.8,
-                size_date.quad_height * 0.8,
-                0.,
-            )),
-            material: materials.add(ColorMaterial::from(b_color)),
+            mesh: mesh,
+            material: material_handle,
             ..default()
         })
-        .insert(light_layer)
-        .insert(PlayerPosition);
-
-    commands
-        .spawn(MaterialMesh2dBundle {
-            mesh: meshes.add(Mesh::from(shape::Circle::default())).into(),
-            transform: Transform::from_xyz(quad_x, quad_y, 0.).with_scale(Vec3::new(
-                size_date.quad_width * 0.8,
-                size_date.quad_height * 0.8,
-                0.,
-            )),
-            material: materials.add(ColorMaterial::from(l_color)),
-            ..default()
-        })
-        .insert(dark_layer)
-        .insert(PlayerPosition);
-}
-
-pub fn spawn_quad(
-    commands: &mut Commands,
-    size_date: &SizeDate,
-    color: Color,
-    materials: &mut Assets<ColorMaterial>,
-    meshes: &mut Assets<Mesh>,
-    layer: RenderLayers,
-    position: Vec2,
-) {
-    // Calculate the position of the quad relative to the window size
-    let quad_x = size_date.get_world_x(position.x);
-    let quad_y = size_date.get_world_y(position.y);
-
-    commands
-        .spawn(MaterialMesh2dBundle {
-            mesh: meshes.add(Mesh::from(shape::Quad::default())).into(),
-            transform: Transform::from_xyz(quad_x, quad_y, 0.).with_scale(Vec3::new(
-                size_date.quad_width,
-                size_date.quad_height,
-                0.,
-            )),
-            material: materials.add(ColorMaterial::from(color)),
-            ..default()
-        })
-        .insert(layer)
-        .insert(OriginalPosition(position));
+        .insert(FullScreen);
 }
 
 pub fn window_resize_system(
     mut size_data: ResMut<SizeDate>,
     mut meshes: ResMut<Assets<Mesh>>,
-    mut resize_reader: EventReader<WindowResized>,    
+    mut resize_reader: EventReader<WindowResized>,
     mut query: Query<&mut Mesh2dHandle, With<FullScreen>>,
 ) {
     for e in resize_reader.iter() {
@@ -283,10 +175,12 @@ pub fn window_resize_system(
 
         for mut mesh_handle in query.iter_mut() {
             info!("Resizing full screen quad");
-            let mesh = meshes.add(Mesh::from(shape::Quad {
-                size: Vec2::new(size_data.screen_w, size_data.screen_h),
-                flip: false,
-            })).into();
+            let mesh = meshes
+                .add(Mesh::from(shape::Quad {
+                    size: Vec2::new(size_data.screen_w, size_data.screen_h),
+                    flip: false,
+                }))
+                .into();
             *mesh_handle = mesh;
         }
     }

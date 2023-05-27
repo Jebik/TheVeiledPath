@@ -46,4 +46,26 @@ pub fn move_system(
         transform.translation.x = world_x;
         transform.translation.y = world_y;
     }
+
+    if input_data.button_a {
+        println!("Button A");
+    }
 }
+
+/*
+fn change_image_system(
+    mut commands: Commands,
+    keyboard_input: Res<Input<KeyCode>>,
+    images: Res<Assets<Image>>,
+    materials: ResMut<Assets<ColorMaterial>>,
+    mut query: Query<(Entity, &FullScreen, &Handle<ColorMaterial>)>,
+) {
+    if keyboard_input.just_released(KeyCode::Space) { // adjust this condition to your needs
+        let new_image_handle = ...; // load or get a new image handle here
+        for (entity, _fullscreen, material_handle) in query.iter_mut() {
+            let mut material = materials.get_mut(material_handle).unwrap();
+            material.texture = Some(new_image_handle.clone());
+        }
+    }
+}
+*/

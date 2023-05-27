@@ -71,14 +71,14 @@ impl SizeDate {
 pub struct GameData {
     pub map: Map,
     pub player: Player,
-    pub dimensions: Dimension,
+    pub dimension: Dimension,
 }
 impl GameData {
     pub(crate) fn new(level_data: &MapData) -> GameData {
         GameData {
             map: Map::new(level_data),
             player: Player::new(level_data),
-            dimensions: Dimension::Light,
+            dimension: Dimension::Light,
         }
     }
 }
