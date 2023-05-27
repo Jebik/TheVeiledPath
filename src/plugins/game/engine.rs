@@ -35,7 +35,9 @@ pub struct SizeDate {
     pub trans_y: f32,
 }
 impl SizeDate {
-    pub(crate) fn new(grid_x: i32, grid_y:i32, width:f32, height:f32) -> SizeDate {    
+    pub(crate) fn new(grid_x: i32, grid_y:i32) -> SizeDate {   
+        let width = 1600.;
+        let height = 900.; 
         let quad_width = width / grid_x as f32;
         let quad_height = height / grid_y as f32;
         let trans_x = (quad_width / 2.0) - (width / 2.0);
