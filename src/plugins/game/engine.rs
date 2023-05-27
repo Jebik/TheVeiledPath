@@ -70,6 +70,7 @@ pub struct GameData {
     pub map: Map,
     pub player: Player,
     pub dimension: Dimension,
+    pub dimension_enabled: bool,
 }
 impl GameData {
     pub(crate) fn new(level_data: &MapData) -> GameData {
@@ -77,6 +78,7 @@ impl GameData {
             map: Map::new(level_data),
             player: Player::new(level_data),
             dimension: Dimension::Light,
+            dimension_enabled: true,
         }
     }
 }

@@ -49,7 +49,7 @@ pub fn move_system(
         transform.translation.y = world_y;
     }
 
-    if input_data.button_a {
+    if input_data.button_a && game_data.dimension_enabled {
         switch_dimension(&mut game_data, &dimension, &mut texture_query);
     }
 }
