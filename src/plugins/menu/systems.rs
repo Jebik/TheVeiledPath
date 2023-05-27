@@ -18,22 +18,25 @@ pub fn menu_ui(
     egui::CentralPanel::default().show(ctx, |ui| {
         ui.vertical_centered(|ui| {
             ui.heading("Menu");
-
-            if ui.add(egui::Button::new("Tuto").fill(egui::Color32::RED)).clicked() {
+            ui.add_space(30.);
+            if ui.add(egui::Button::new("Tuto")).clicked() {
                 *level = LevelChoice::Tutorial;
                 state.set(GameState::Game);
             }
-            if ui.add(egui::Button::new("Level 1").fill(egui::Color32::RED)).clicked() {
+            ui.add_space(15.);
+            if ui.add(egui::Button::new("Level 1")).clicked() {
                 *level = LevelChoice::Level1;
                 state.set(GameState::Game);
             }
+            ui.add_space(15.);
             if let Some(_) = map.custom_map {
-                if ui.add(egui::Button::new("Custom").fill(egui::Color32::RED)).clicked() {
+                if ui.add(egui::Button::new("Custom")).clicked() {
                     *level = LevelChoice::Custom;
                     state.set(GameState::Game);
                 }
             }
-            if ui.add(egui::Button::new("Quit").fill(egui::Color32::RED)).clicked() {
+            ui.add_space(15.);
+            if ui.add(egui::Button::new("Quit")).clicked() {
                 app_exit_events.send(AppExit);
             }
         });

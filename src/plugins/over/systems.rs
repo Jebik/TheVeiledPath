@@ -1,6 +1,9 @@
-use bevy::{prelude::{EventWriter, ResMut, NextState}, app::AppExit};
-use bevy_egui::{EguiContexts, egui};
 use crate::plugins::types::GameState;
+use bevy::{
+    app::AppExit,
+    prelude::{EventWriter, NextState, ResMut},
+};
+use bevy_egui::{egui, EguiContexts};
 
 pub fn over_ui(
     mut contexts: EguiContexts,
@@ -11,15 +14,18 @@ pub fn over_ui(
 
     egui::CentralPanel::default().show(ctx, |ui| {
         ui.vertical_centered(|ui| {
-        ui.heading("GAME OVER");
+            ui.heading("GAME OVER");
+            ui.add_space(15.);
 
-            if ui.add(egui::Button::new("Try again").fill(egui::Color32::RED)).clicked() {
+            if ui.add(egui::Button::new("Try again")).clicked() {
                 state.set(GameState::Game);
             }
-            if ui.add(egui::Button::new("Menu").fill(egui::Color32::RED)).clicked() {
+            ui.add_space(15.);
+            if ui.add(egui::Button::new("Menu")).clicked() {
                 state.set(GameState::Menu);
             }
-            if ui.add(egui::Button::new("Quit").fill(egui::Color32::RED)).clicked() {
+            ui.add_space(15.);
+            if ui.add(egui::Button::new("Quit")).clicked() {
                 app_exit_events.send(AppExit);
             }
         });
