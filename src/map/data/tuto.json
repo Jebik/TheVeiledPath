@@ -8,23 +8,101 @@
     "walls": [
         {
             "x": 4,
-            "y": 4,
+            "y": 0,
             "dimension": "Light"
         },
         {
-            "x": 15,
-            "y": 8,
+            "x": 4,
+            "y": 1,
             "dimension": "Light"
         },
         {
-            "x": 15,
-            "y": 4,
+            "x": 4,
+            "y": 2,
+            "dimension": "Light"
+        },
+        {
+            "x": 4,
+            "y": 3,
             "dimension": "Light"
         },
         {
             "x": 4,
             "y": 4,
+            "dimension": "Light"
+        },
+        {
+            "x": 4,
+            "y": 5,
+            "dimension": "Light"
+        },
+        {
+            "x": 4,
+            "y": 6,
+            "dimension": "Light"
+        },
+        {
+            "x": 4,
+            "y": 7,
+            "dimension": "Light"
+        },
+        {
+            "x": 4,
+            "y": 8,
+            "dimension": "Light"
+        },
+
+
+        {
+            "x": 7,
+            "y": 0,
             "dimension": "Dark"
+        },
+        {
+            "x": 7,
+            "y": 1,
+            "dimension": "Dark"
+        },
+        {
+            "x": 7,
+            "y": 2,
+            "dimension": "Dark"
+        },
+        {
+            "x": 7,
+            "y": 3,
+            "dimension": "Dark"
+        },
+        {
+            "x": 7,
+            "y": 4,
+            "dimension": "Dark"
+        },
+        {
+            "x": 7,
+            "y": 5,
+            "dimension": "Dark"
+        },
+        {
+            "x": 7,
+            "y": 6,
+            "dimension": "Dark"
+        },
+        {
+            "x": 7,
+            "y": 7,
+            "dimension": "Dark"
+        },
+        {
+            "x": 7,
+            "y": 8,
+            "dimension": "Dark"
+        },
+
+        {
+            "x": 15,
+            "y": 8,
+            "dimension": "Light"
         }
     ],
     "doors": [],
