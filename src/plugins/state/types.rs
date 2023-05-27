@@ -4,7 +4,7 @@ use bevy::prelude::States;
 pub enum GameState {
     Menu,
     Game,
-    _GameOver,
+    Over,
 }
 impl Default for GameState {
     fn default() -> Self {

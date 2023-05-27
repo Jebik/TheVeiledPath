@@ -1,13 +1,13 @@
-use bevy::prelude::{Plugin, App};
-use super::systems::over_state_system;
+use bevy::prelude::{Plugin, App, IntoSystemConfig, OnUpdate};
+use crate::plugins::types::GameState;
+
+use super::systems::over_ui;
 
 // Menu Plugin
 pub struct OverPlugin;
 
 impl Plugin for OverPlugin {
     fn build(&self, app: &mut App) {
-        // Add systems, resources, and setup tasks specific to the menu game state
-        app.add_system(over_state_system);
-        // Add other systems and resources as needed
+        app.add_system(over_ui.in_set(OnUpdate(GameState::Over)));
     }
 }

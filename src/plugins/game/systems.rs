@@ -9,7 +9,7 @@ use crate::{
 use bevy::{
     ecs::system::{Commands, Res},
     prelude::{
-        default, info, shape, Assets, Camera2dBundle, Component, EventReader, Image, Mesh, Query, ResMut, Vec2, With,
+        default, info, shape, Assets, Camera2dBundle, Component, EventReader, Image, Mesh, Query, ResMut, Vec2, With, Entity,
     },
     render::{
         render_resource::{
@@ -19,6 +19,15 @@ use bevy::{
     sprite::{ColorMaterial, MaterialMesh2dBundle, Mesh2dHandle},
     window::{Window, WindowResized},
 };
+
+pub fn cleanup_game(
+    mut commands: Commands, 
+    query: Query<Entity, With<GameEntity>>
+) {
+    for entity in query.iter() {
+        commands.entity(entity).despawn();
+    }
+}
 
 pub fn setup_game(
     mut commands: Commands,
@@ -65,6 +74,9 @@ pub fn setup_game(
 pub struct PlayerPosition;
 #[derive(Component)]
 pub struct FullScreen;
+
+#[derive(Component)]
+pub struct GameEntity;
 
 pub fn init_target() -> Image {
     let size = Extent3d {
@@ -136,7 +148,7 @@ fn spawn_full_screen_quad(
 ) {
     let material_handle = dimension.get_material_handle(game_data.dimension);
     let camera = Camera2dBundle::default();
-    commands.spawn(camera);
+    commands.spawn(camera).insert(GameEntity);
 
     // Create the quad mesh
     let mesh = meshes
@@ -152,7 +164,8 @@ fn spawn_full_screen_quad(
             material: material_handle,
             ..default()
         })
-        .insert(FullScreen);
+        .insert(FullScreen)
+        .insert(GameEntity);
 }
 
 pub fn window_resize_system(

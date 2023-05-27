@@ -1,18 +1,18 @@
 use bevy::prelude::warn;
 use crate::map::json_types::{Dimension, MapData};
 
-#[derive(PartialEq, Eq)]
+#[derive(PartialEq, Eq, Debug, Clone)]
 pub struct Door {
     open: bool,
     id: u32,
 }
 
-#[derive(PartialEq, Eq)]
+#[derive(PartialEq, Eq, Debug, Clone)]
 pub struct Key {
     door_id: u32,
 }
 
-#[derive(PartialEq, Eq)]
+#[derive(PartialEq, Eq, Debug, Clone)]
 pub enum ItemType {
     Wall,
     Door(Door),
@@ -20,6 +20,7 @@ pub enum ItemType {
     None,
 }
 
+#[derive(Debug, Clone)]
 pub struct Cell {
     pub x: f32,
     pub y: f32,
@@ -70,17 +71,17 @@ impl Map {
         map
     }
 
-    pub (crate) fn _at(&self, x: i32, y: i32, dimension: Dimension) -> Option<&Cell> {
+    pub (crate) fn at(&self, x: i32, y: i32, dimension: Dimension) -> Option<Cell> {
         // Check if the provided coordinates are within the valid range
         if x >= 0 && x < self.width && y >= 0 && y < self.height {
             // Calculate the index based on the provided x and y coordinates
-            let index = (y * self.width + x) as usize;
+            let index = (x * self.height + y) as usize;
             match dimension {
                 Dimension::Light => {
-                    Some(&self.light_cells[index])
+                    Some(self.light_cells[index].clone())
                 },
                 Dimension::Dark => {
-                    Some(&self.dark_cells[index])
+                    Some(self.dark_cells[index].clone())
                 },
             }
         } else {

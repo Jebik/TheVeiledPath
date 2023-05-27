@@ -1,7 +1,7 @@
 use super::{
     engine::{GameData, SizeDate},
     map::ItemType,
-    systems::PlayerPosition,
+    systems::{PlayerPosition, GameEntity},
 };
 use crate::map::json_types::Dimension;
 use bevy::{
@@ -107,7 +107,7 @@ pub fn init_dimension_world(
     let mut camera = Camera2dBundle::default();
     camera.camera.target = RenderTarget::Image(image_handle);
     camera.camera_2d.clear_color = ClearColorConfig::Custom(back_color);
-    commands.spawn((camera, render_layer));
+    commands.spawn((camera, render_layer)).insert(GameEntity);
 
     let cells = match dimension {
         Dimension::Light => &game_data.map.light_cells,
@@ -165,7 +165,7 @@ fn spawn_quad(
             material: materials.add(ColorMaterial::from(color)),
             ..default()
         })
-        .insert(layer);
+        .insert(layer).insert(GameEntity);
 }
 
 fn spawn_player(
@@ -193,5 +193,6 @@ fn spawn_player(
             ..default()
         })
         .insert(render_layer)
-        .insert(PlayerPosition);
+        .insert(PlayerPosition)
+        .insert(GameEntity);
 }
