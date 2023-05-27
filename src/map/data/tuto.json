@@ -1,8 +1,8 @@
 {
     "name": "Tutorial",
     "size": 16,
-    "start_x": 2,
-    "start_y": 4,
+    "start_x": 0,
+    "start_y": 5,
     "goal_x": 14,
     "goal_y": 5,
     "walls": [

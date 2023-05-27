@@ -1,4 +1,4 @@
-use super::{engine::GameData, dimension::{init_dimension_world, init_dimension, DimensionHandle}, tutorial::Tutorial};
+use super::{engine::GameData, dimension::{init_dimension_world, init_dimension, DimensionHandle}, tutorial::{Tutorial, init_tuto}};
 use crate::{
     map::{json_types::Dimension, map_manager::MapManager},
     plugins::{
@@ -50,9 +50,9 @@ pub fn setup_game(
         LevelChoice::None => panic!("Level Selection to None while going inside GamePlugin"),
     };
     let mut game_data = GameData::new(level_data);
-    let tutorial = Tutorial::new();
+    let mut tutorial = Tutorial::new();
     match *level {
-        LevelChoice::Tutorial => game_data.dimension_enabled = false,
+        LevelChoice::Tutorial => init_tuto(&mut game_data, &mut tutorial),
         _ => ()
     };
 

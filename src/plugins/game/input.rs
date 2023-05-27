@@ -5,7 +5,7 @@ use bevy::{
 
 use crate::{plugins::input::types::{Action, InputData, InputMap}};
 
-use super::{systems::{PlayerPosition, FullScreen}, engine::{GameData, SizeDate}, dimension::DimensionHandle};
+use super::{systems::{PlayerPosition, FullScreen}, engine::{GameData, SizeDate}, dimension::DimensionHandle, tutorial::Tutorial};
 
 pub fn setup_input(mut input_map: ResMut<InputMap>) {
     // bind keyboard keys
@@ -30,27 +30,37 @@ pub fn move_system(
     input_data: Res<InputData>,
     dimension: Res<DimensionHandle>,
     mut game_data: ResMut<GameData>,
+    mut tutorial: ResMut<Tutorial>,
     mut player_query: Query<&mut Transform, With<PlayerPosition>>,
     mut texture_query: Query<&mut Handle<ColorMaterial>, With<FullScreen>>,
 ) {
-    let move_x = input_data.left_stick_x * time.delta_seconds();
-    let move_y = input_data.left_stick_y * time.delta_seconds();
-    if (move_x > 0.1 || move_x < -0.1) && (move_y > 0.1 || move_y < -0.1) {
-        game_data.player.dir_x = move_x;
-        game_data.player.dir_y = move_y;
-    }
-    game_data.player.x += move_x * 2.;
-    game_data.player.y += move_y * 2.;
-    
-    for mut transform in player_query.iter_mut() {
-        let world_x = size_date.get_world_x(game_data.player.x);
-        let world_y = size_date.get_world_y(game_data.player.y);
-        transform.translation.x = world_x;
-        transform.translation.y = world_y;
-    }
-
-    if input_data.button_a && game_data.dimension_enabled {
-        switch_dimension(&mut game_data, &dimension, &mut texture_query);
+    tutorial.check_message(&mut game_data);
+    if tutorial.current_message_index.is_some() {        
+        if input_data.button_a {
+            tutorial.delete_message();
+        } 
+    } else {
+        let move_x = input_data.left_stick_x * time.delta_seconds();
+        let move_y = input_data.left_stick_y * time.delta_seconds();
+        if (move_x > 0.1 || move_x < -0.1) && (move_y > 0.1 || move_y < -0.1) {
+            game_data.player.dir_x = move_x;
+            game_data.player.dir_y = move_y;
+        }
+        game_data.player.x += move_x * 2.;
+        game_data.player.y += move_y * 2.;
+            
+        for mut transform in player_query.iter_mut() {
+            let world_x = size_date.get_world_x(game_data.player.x);
+            let world_y = size_date.get_world_y(game_data.player.y);
+            transform.translation.x = world_x;
+            transform.translation.y = world_y;
+        }
+            
+        if input_data.button_a {
+            if game_data.dimension_enabled {
+                switch_dimension(&mut game_data, &dimension, &mut texture_query);
+            }
+        }
     }
 }
 

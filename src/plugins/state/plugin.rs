@@ -42,7 +42,7 @@ fn configure_egui(
     let mut style = (*ctx.style()).clone();
     style.text_styles = [
         (TextStyle::Heading, FontId::new(150.0, Proportional)),
-        (TextStyle::Body, FontId::new(100.0, Proportional)),
+        (TextStyle::Body, FontId::new(50.0, Proportional)),
         (TextStyle::Monospace, FontId::new(100.0, Monospace)),
         (TextStyle::Button, FontId::new(100.0, Proportional)),
         (TextStyle::Small, FontId::new(100.0, Proportional)),
