@@ -36,7 +36,7 @@ impl Cell {
 
     fn set_data(&mut self, item_type: ItemType) {
         if self.item_type != ItemType::None {
-            warn!("Cell already has data, overwriting data")
+            warn!("Cell already has data, overwriting data x: {}, y: {}", self.x, self.y);
         }
         self.item_type = item_type;
     }

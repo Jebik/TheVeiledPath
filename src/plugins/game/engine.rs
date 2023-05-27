@@ -1,4 +1,4 @@
-use bevy::prelude::{Resource, info};
+use bevy::prelude::Resource;
 use super::map::Map;
 use crate::map::json_types::{MapData, Dimension};
 
@@ -6,6 +6,8 @@ use crate::map::json_types::{MapData, Dimension};
 pub struct Player {
     pub x: f32,
     pub y: f32,
+    pub dir_x: f32,
+    pub dir_y: f32,
     pub goal_x: i32,
     pub goal_y: i32,
 }
@@ -14,6 +16,8 @@ impl Player {
         Player { 
             x: level_data.start_x as f32 + 0.5,
             y: level_data.start_y as f32 + 0.5,
+            dir_x: 1.,
+            dir_y: 0.,
             goal_x: level_data.goal_x,
             goal_y: level_data.goal_y
         }
@@ -36,11 +40,6 @@ impl SizeDate {
         let quad_height = height / grid_y as f32;
         let trans_x = (quad_width / 2.0) - (width / 2.0);
         let trans_y = - (quad_height / 2.0) + (height / 2.0);
-
-
-        info!("quad_width: {}, quad_height: {}", quad_width, quad_height);
-        info!("grid_x: {}, grid_y: {}", grid_x, grid_y);
-        info!("trans_x: {}, trans_y: {}", trans_x, trans_y);
 
         SizeDate {
             grid_x,

@@ -1,9 +1,11 @@
 use bevy::{
-    prelude::{info, GamepadAxisType, GamepadButtonType, KeyCode, Query, Res, ResMut},
+    prelude::{GamepadAxisType, GamepadButtonType, KeyCode, Query, Res, ResMut, Transform, With},
     time::Time,
 };
 
 use crate::plugins::input::types::{Action, InputData, InputMap};
+
+use super::{systems::PlayerPosition, engine::{GameData, SizeDate}};
 
 pub fn setup_input(mut input_map: ResMut<InputMap>) {
     // bind keyboard keys
@@ -24,10 +26,24 @@ pub fn setup_input(mut input_map: ResMut<InputMap>) {
 
 pub fn move_system(
     time: Res<Time>,
-    //mut query: Query<&mut Transform, With<Player>>,
+    size_date: Res<SizeDate>,
+    mut game_data: ResMut<GameData>,
+    mut query: Query<&mut Transform, With<PlayerPosition>>,
     input_data: Res<InputData>,
 ) {
     let move_x = input_data.left_stick_x * time.delta_seconds();
     let move_y = input_data.left_stick_y * time.delta_seconds();
-    //info!("move_x: {}, move_y: {}", move_x, move_y)
+    if (move_x > 0.1 || move_x < -0.1) && (move_y > 0.1 || move_y < -0.1) {
+        game_data.player.dir_x = move_x;
+        game_data.player.dir_y = move_y;
+    }
+    game_data.player.x += move_x * 2.;
+    game_data.player.y += move_y * 2.;
+    
+    for mut transform in query.iter_mut() {
+        let world_x = size_date.get_world_x(game_data.player.x);
+        let world_y = size_date.get_world_y(game_data.player.y);
+        transform.translation.x = world_x;
+        transform.translation.y = world_y;
+    }
 }
