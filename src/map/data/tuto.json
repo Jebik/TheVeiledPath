@@ -24,11 +24,6 @@
         {
             "x": 4,
             "y": 4,
-            "dimension": "Light"
-        },
-        {
-            "x": 4,
-            "y": 4,
             "dimension": "Dark"
         }
     ],

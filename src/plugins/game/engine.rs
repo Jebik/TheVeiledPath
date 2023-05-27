@@ -29,23 +29,27 @@ impl Player {
 pub struct SizeDate {
     pub grid_x: i32,
     pub grid_y: i32,
+    pub screen_w: f32,
+    pub screen_h: f32,
     pub quad_height: f32,
     pub quad_width: f32,
     pub trans_x: f32,
     pub trans_y: f32,
 }
 impl SizeDate {
-    pub(crate) fn new(grid_x: i32, grid_y:i32) -> SizeDate {   
-        let width = 1600.;
-        let height = 900.; 
-        let quad_width = width / grid_x as f32;
-        let quad_height = height / grid_y as f32;
-        let trans_x = (quad_width / 2.0) - (width / 2.0);
-        let trans_y = - (quad_height / 2.0) + (height / 2.0);
+    pub(crate) fn new(grid_x: i32, grid_y:i32, width:f32, height:f32) -> SizeDate {   
+        let img_width = 1600.;
+        let img_height = 900.; 
+        let quad_width = img_width / grid_x as f32;
+        let quad_height = img_height / grid_y as f32;
+        let trans_x = (quad_width / 2.0) - (img_width / 2.0);
+        let trans_y = - (quad_height / 2.0) + (img_height / 2.0);
 
         SizeDate {
             grid_x,
             grid_y,
+            screen_w: width,
+            screen_h: height,
             quad_height,
             quad_width,
             trans_x ,
