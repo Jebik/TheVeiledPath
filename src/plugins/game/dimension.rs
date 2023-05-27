@@ -1,7 +1,7 @@
 use super::{
     engine::{GameData, SizeDate},
-    map::ItemType,
-    systems::{PlayerPosition, GameEntity},
+    map::{ItemType, Door, Key},
+    systems::{PlayerPosition, GameEntity, DoorId},
 };
 use crate::map::json_types::Dimension;
 use bevy::{
@@ -94,7 +94,7 @@ pub fn init_dimension(
 pub fn init_dimension_world(
     dimension: Dimension,
     dimension_handle: &DimensionHandle,
-    game_data: &GameData,
+    game_data: &mut GameData,
     size_data: &SizeDate,
     commands: &mut Commands,
     materials: &mut Assets<ColorMaterial>,
@@ -110,22 +110,59 @@ pub fn init_dimension_world(
     commands.spawn((camera, render_layer)).insert(GameEntity);
 
     let cells = match dimension {
-        Dimension::Light => &game_data.map.light_cells,
-        Dimension::Dark => &game_data.map.dark_cells,
+        Dimension::Light => &mut game_data.map.light_cells,
+        Dimension::Dark => &mut game_data.map.dark_cells,
     };
 
     for cell in cells {
-        if cell.item_type == ItemType::Wall {
-            let position = Vec2::new(cell.x, cell.y);
-            spawn_quad(
-                commands,
-                &size_data,
-                front_color,
-                materials,
-                meshes,
-                render_layer,
-                position,
-            );
+        let position = Vec2::new(cell.x, cell.y);
+        match &cell.item_type {
+            ItemType::Wall => {
+                spawn_quad(
+                    commands,
+                    &size_data,
+                    front_color,
+                    materials,
+                    meshes,
+                    render_layer,
+                    position,
+                );
+            }
+            ItemType::Door(d) => {
+                spawn_door(
+                    commands,
+                    &size_data,
+                    front_color,
+                    materials,
+                    meshes,
+                    render_layer,
+                    position,
+                    d
+                );
+            },
+            ItemType::Key(k) => {
+                spawn_key(
+                    commands,
+                    &size_data,
+                    materials,
+                    meshes,
+                    render_layer,
+                    position,
+                    k
+                );
+            },
+            ItemType::Goal => {
+                spawn_goal(
+                    commands,
+                    &size_data,
+                    materials,
+                    meshes,
+                    render_layer,
+                    front_color,
+                    position,
+                );
+            },
+            ItemType::None => ()
         }
     }
 
@@ -168,6 +205,66 @@ fn spawn_quad(
         .insert(layer).insert(GameEntity);
 }
 
+fn spawn_door(
+    commands: &mut Commands,
+    size_date: &SizeDate,
+    color: Color,
+    materials: &mut Assets<ColorMaterial>,
+    meshes: &mut Assets<Mesh>,
+    layer: RenderLayers,
+    position: Vec2,
+    door: &Door
+) {
+    // Calculate the position of the quad relative to the window size
+    let quad_x = size_date.get_world_x(position.x);
+    let quad_y = size_date.get_world_y(position.y);
+
+    commands
+        .spawn(MaterialMesh2dBundle {
+            mesh: meshes.add(Mesh::from(shape::Quad::default())).into(),
+            transform: Transform::from_xyz(quad_x, quad_y, 0.).with_scale(Vec3::new(
+                size_date.quad_width,
+                size_date.quad_height,
+                0.,
+            )),
+            material: materials.add(ColorMaterial::from(color)),
+            ..default()
+        })
+        .insert(layer)
+        .insert(GameEntity)
+        .insert(DoorId(door.id));
+}
+
+fn spawn_key(
+    commands: &mut Commands,
+    size_date: &SizeDate,
+    materials: &mut Assets<ColorMaterial>,
+    meshes: &mut Assets<Mesh>,
+    layer: RenderLayers,
+    position: Vec2,
+    key: &Key
+) {
+    let color = Color::rgb(0.5, 0.5, 0.5);
+    // Calculate the position of the quad relative to the window size
+    let quad_x = size_date.get_world_x(position.x);
+    let quad_y = size_date.get_world_y(position.y);
+
+    commands
+        .spawn(MaterialMesh2dBundle {
+            mesh: meshes.add(Mesh::from(shape::Circle::default())).into(),
+            transform: Transform::from_xyz(quad_x, quad_y, 0.).with_scale(Vec3::new(
+                size_date.quad_width * 0.6,
+                size_date.quad_height * 0.6,
+                0.,
+            )),
+            material: materials.add(ColorMaterial::from(color)),
+            ..default()
+        })
+        .insert(layer)
+        .insert(GameEntity)
+        .insert(DoorId(key.door_id));
+}
+
 fn spawn_player(
     commands: &mut Commands,
     size_date: &SizeDate,
@@ -185,8 +282,8 @@ fn spawn_player(
         .spawn(MaterialMesh2dBundle {
             mesh: meshes.add(Mesh::from(shape::Circle::default())).into(),
             transform: Transform::from_xyz(quad_x, quad_y, 0.).with_scale(Vec3::new(
-                size_date.quad_width * 0.8,
-                size_date.quad_height * 0.8,
+                size_date.quad_width * 0.6,
+                size_date.quad_height * 0.6,
                 0.,
             )),
             material: materials.add(ColorMaterial::from(color)),
@@ -196,3 +293,32 @@ fn spawn_player(
         .insert(PlayerPosition)
         .insert(GameEntity);
 }
+
+fn spawn_goal(
+    commands: &mut Commands,
+    size_date: &SizeDate,
+    materials: &mut Assets<ColorMaterial>,
+    meshes: &mut Assets<Mesh>,
+    render_layer: RenderLayers,
+    color: Color,
+    position: Vec2,
+) {
+    // Calculate the position of the quad relative to the window size
+    let quad_x = size_date.get_world_x(position.x);
+    let quad_y = size_date.get_world_y(position.y);
+
+    commands
+        .spawn(MaterialMesh2dBundle {
+            mesh: meshes.add(Mesh::from(shape::Circle::default())).into(),
+            transform: Transform::from_xyz(quad_x, quad_y, 0.).with_scale(Vec3::new(
+                size_date.quad_width * 0.6,
+                size_date.quad_height * 0.6,
+                0.,
+            )),
+            material: materials.add(ColorMaterial::from(color)),
+            ..default()
+        })
+        .insert(render_layer)
+        .insert(GameEntity);
+}
+

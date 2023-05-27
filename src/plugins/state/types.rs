@@ -5,6 +5,7 @@ pub enum GameState {
     Menu,
     Game,
     Over,
+    Win,
 }
 impl Default for GameState {
     fn default() -> Self {

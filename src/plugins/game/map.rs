@@ -1,19 +1,25 @@
-use bevy::prelude::warn;
+use bevy::prelude::{warn, Entity, Commands, Query};
 use crate::map::json_types::{Dimension, MapData};
+
+use super::systems::DoorId;
 
 #[derive(PartialEq, Eq, Debug, Clone)]
 pub struct Door {
-    open: bool,
-    id: u32,
+    pub open: bool,
+    pub id: u32,
+    pub entity: Option<Entity>,
 }
 
 #[derive(PartialEq, Eq, Debug, Clone)]
 pub struct Key {
-    door_id: u32,
+    pub taken: bool,
+    pub door_id: u32,
+    pub entity: Option<Entity>,
 }
 
 #[derive(PartialEq, Eq, Debug, Clone)]
 pub enum ItemType {
+    Goal,
     Wall,
     Door(Door),
     Key(Key),
@@ -100,11 +106,57 @@ impl Map {
             },
         }
     }
+
+    pub(crate) fn open_door(
+        &mut self,
+        commands: &mut Commands, 
+        door_id: u32,  
+        query: &Query<(Entity, &DoorId)>
+    ) {
+        for cell in &mut self.light_cells {
+            if let ItemType::Door(door) = &mut cell.item_type {
+                if door.id == door_id {
+                    door.open = true;
+                }
+            } else if let ItemType::Key(key) = &mut cell.item_type {
+                if key.door_id == door_id {
+                    key.taken = true;
+                }
+            }
+        }
+        for cell in &mut self.dark_cells {
+            if let ItemType::Door(door) = &mut cell.item_type {
+                if door.id == door_id {
+                    door.open = true;
+                }
+            } else if let ItemType::Key(key) = &mut cell.item_type {
+                if key.door_id == door_id {
+                    key.taken = true;
+                }
+            }
+        }
+
+        for (entity, doorid) in query.iter() {
+            if doorid.0 == door_id {
+                commands.entity(entity).despawn();
+            }
+        }
+    }
 }
 
 
-
 fn generate_map(map_data: &MapData, map: &mut Map) {
+    if let Some(cell) = map.get_mut_cell(map_data.goal_x, map_data.goal_y, Dimension::Light) {
+        cell.set_data(ItemType::Goal);
+    } else {
+        warn!("Parse Map Wall in invalid position: ({}, {})", map_data.goal_x, map_data.goal_y);
+    }
+    if let Some(cell) = map.get_mut_cell(map_data.goal_x, map_data.goal_y, Dimension::Dark) {
+        cell.set_data(ItemType::Goal);
+    } else {
+        warn!("Parse Map Wall in invalid position: ({}, {})", map_data.goal_x, map_data.goal_y);
+    }
+
     // Iterate over the walls and add them to the corresponding cells
     for wall in &map_data.walls {
         if let Some(cell) = map.get_mut_cell(wall.x, wall.y, wall.dimension) {
@@ -116,7 +168,7 @@ fn generate_map(map_data: &MapData, map: &mut Map) {
     // Iterate over the doors and add them to the corresponding cells
     for door in &map_data.doors {
         if let Some(cell) = map.get_mut_cell(door.x, door.y, door.dimension) {
-            cell.set_data(ItemType::Door(Door { open: false, id: door.id }));
+            cell.set_data(ItemType::Door(Door { open: false, id: door.id, entity: None }));
         } else {
             warn!("Parse Map Door in invalid position: ({}, {})", door.x, door.y);
         }
@@ -124,7 +176,7 @@ fn generate_map(map_data: &MapData, map: &mut Map) {
     // Iterate over the doors and add them to the corresponding cells
     for key in &map_data.keys {
         if let Some(cell) = map.get_mut_cell(key.x, key.y, key.dimension) {
-            cell.set_data(ItemType::Key(Key { door_id: key.door_id }));
+            cell.set_data(ItemType::Key(Key { taken: false, door_id: key.door_id, entity: None }));
         } else {
             warn!("Parse Map Door in invalid position: ({}, {})", key.x, key.y);
         }

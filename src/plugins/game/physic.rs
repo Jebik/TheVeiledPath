@@ -1,10 +1,13 @@
-use super::engine::GameData;
-use crate::plugins::{game::map::{Cell, ItemType}, types::GameState};
-use bevy::prelude::{Res, NextState, ResMut};
+use super::{engine::GameData, systems::DoorId};
+use crate::{plugins::{game::map::{Cell, ItemType}, types::GameState}};
+use bevy::prelude::{NextState, ResMut, Commands, Query, Entity};
 
 pub fn physic_system(
-    game_data: Res<GameData>,
-    mut state: ResMut<NextState<GameState>>) {
+    mut commands: Commands, 
+    mut game_data: ResMut<GameData>,
+    mut state: ResMut<NextState<GameState>>,    
+    query: Query<(Entity, &DoorId)>
+) {
     /*
         BASIC PHYSIC SYSTEM
         WE ONLY CHECK 8 BOX AROUND AND GROUND
@@ -18,26 +21,61 @@ pub fn physic_system(
             let cell = game_data.map.at(x + dx, y + dy, game_data.dimension);
             match cell {
                 Some(cell) => surrounding_cells.push(cell),
-                None => surrounding_cells.push(Cell {
-                    // if cell is None, push a new Cell with item_type set to Wall
-                    x: (x + dx) as f32,
-                    y: (y + dy) as f32,
-                    item_type: ItemType::Wall,
-                }),
+                None => { 
+                    surrounding_cells.push(Cell {
+                        x: (x + dx) as f32,
+                        y: (y + dy) as f32,
+                        item_type: ItemType::Wall,
+                    });
+                }
             }
         }
     }
 
-    for cell in &surrounding_cells {
-        if cell.item_type == ItemType::Wall && check_wall_collision(game_data.player.x, game_data.player.y, cell.x, cell.y) {
-            state.set(GameState::Over);
+    for cell in &mut surrounding_cells {
+        match &mut cell.item_type {
+            ItemType::Wall => {
+                if check_wall_collision(game_data.player.x, game_data.player.y, cell.x, cell.y) {
+                    state.set(GameState::Over);
+                }
+            }
+            ItemType::Door(door) => {
+                if door.open {
+                    continue;
+                } else if check_wall_collision(game_data.player.x, game_data.player.y, cell.x, cell.y) {
+                    state.set(GameState::Over);                    
+                }
+            },
+            ItemType::Key(key) => {
+                if check_circle_collision(game_data.player.x, game_data.player.y, cell.x, cell.y) {
+                    game_data.map.open_door(&mut commands, key.door_id, &query);
+                }
+            },
+            ItemType::Goal => {
+                if check_circle_collision(game_data.player.x, game_data.player.y, cell.x, cell.y) {
+                    state.set(GameState::Win);
+                }
+            },
+            ItemType::None => ()
         }
     }
 }
 
+fn check_circle_collision(player_x: f32, player_y: f32, key_x: f32, key_y: f32) -> bool {
+    let circle_radius = 0.3; // radius of the circle (player), assuming diameter is 0.3
+
+    // Calculate the distance between the two circles' centers
+    let distance_x = player_x - key_x;
+    let distance_y = player_y - key_y;
+    let distance = (distance_x.powi(2) + distance_y.powi(2)).sqrt();
+
+    // Check if the distance is less than or equal to the sum of the radii
+    distance <= (circle_radius + circle_radius)
+}
+
 fn check_wall_collision(player_x: f32, player_y: f32, wall_x: f32, wall_y: f32) -> bool {
     let half_size = 0.5; // half size of the square (wall), assuming unit size is 1
-    let circle_radius = 0.35; // radius of the circle (player), assuming diameter is 0.7
+    let circle_radius = 0.3; // radius of the circle (player), assuming diameter is 0.7
 
     // Calculate the closest point on the square to the circle
     let closest_x = if player_x < wall_x - half_size {

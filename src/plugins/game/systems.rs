@@ -84,6 +84,9 @@ pub struct FullScreen;
 #[derive(Component)]
 pub struct GameEntity;
 
+#[derive(Component)]
+pub struct DoorId(pub u32);
+
 pub fn init_target() -> Image {
     let size = Extent3d {
         width: 1600,
