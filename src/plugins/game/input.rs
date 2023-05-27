@@ -1,11 +1,11 @@
 use bevy::{
-    prelude::{GamepadAxisType, GamepadButtonType, KeyCode, Query, Res, ResMut, Transform, With},
-    time::Time,
+    prelude::{GamepadAxisType, GamepadButtonType, KeyCode, Query, Res, ResMut, Transform, With, Handle},
+    time::Time, sprite::{ColorMaterial},
 };
 
-use crate::plugins::input::types::{Action, InputData, InputMap};
+use crate::{plugins::input::types::{Action, InputData, InputMap}};
 
-use super::{systems::PlayerPosition, engine::{GameData, SizeDate}};
+use super::{systems::{PlayerPosition, FullScreen}, engine::{GameData, SizeDate}, dimension::DimensionHandle};
 
 pub fn setup_input(mut input_map: ResMut<InputMap>) {
     // bind keyboard keys
@@ -27,9 +27,11 @@ pub fn setup_input(mut input_map: ResMut<InputMap>) {
 pub fn move_system(
     time: Res<Time>,
     size_date: Res<SizeDate>,
-    mut game_data: ResMut<GameData>,
-    mut query: Query<&mut Transform, With<PlayerPosition>>,
     input_data: Res<InputData>,
+    dimension: Res<DimensionHandle>,
+    mut game_data: ResMut<GameData>,
+    mut player_query: Query<&mut Transform, With<PlayerPosition>>,
+    mut texture_query: Query<&mut Handle<ColorMaterial>, With<FullScreen>>,
 ) {
     let move_x = input_data.left_stick_x * time.delta_seconds();
     let move_y = input_data.left_stick_y * time.delta_seconds();
@@ -40,7 +42,7 @@ pub fn move_system(
     game_data.player.x += move_x * 2.;
     game_data.player.y += move_y * 2.;
     
-    for mut transform in query.iter_mut() {
+    for mut transform in player_query.iter_mut() {
         let world_x = size_date.get_world_x(game_data.player.x);
         let world_y = size_date.get_world_y(game_data.player.y);
         transform.translation.x = world_x;
@@ -48,24 +50,19 @@ pub fn move_system(
     }
 
     if input_data.button_a {
-        println!("Button A");
+        switch_dimension(&mut game_data, &dimension, &mut texture_query);
     }
 }
 
-/*
-fn change_image_system(
-    mut commands: Commands,
-    keyboard_input: Res<Input<KeyCode>>,
-    images: Res<Assets<Image>>,
-    materials: ResMut<Assets<ColorMaterial>>,
-    mut query: Query<(Entity, &FullScreen, &Handle<ColorMaterial>)>,
+fn switch_dimension(
+    game_data: &mut GameData,
+    dimension: &DimensionHandle,
+    texture_query: &mut Query<&mut Handle<ColorMaterial>, With<FullScreen>>,
 ) {
-    if keyboard_input.just_released(KeyCode::Space) { // adjust this condition to your needs
-        let new_image_handle = ...; // load or get a new image handle here
-        for (entity, _fullscreen, material_handle) in query.iter_mut() {
-            let mut material = materials.get_mut(material_handle).unwrap();
-            material.texture = Some(new_image_handle.clone());
-        }
+    game_data.dimension.switch_dimension();
+
+    let mew_material_handle = dimension.get_material_handle(game_data.dimension);
+    for mut material_handle in texture_query.iter_mut() {
+        *material_handle = mew_material_handle.clone();
     }
 }
-*/

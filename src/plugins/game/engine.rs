@@ -1,7 +1,6 @@
-use bevy::prelude::Resource;
 use super::map::Map;
-use crate::map::json_types::{MapData, Dimension};
-
+use crate::map::json_types::{Dimension, MapData};
+use bevy::prelude::Resource;
 
 pub struct Player {
     pub x: f32,
@@ -13,17 +12,16 @@ pub struct Player {
 }
 impl Player {
     fn new(level_data: &MapData) -> Player {
-        Player { 
+        Player {
             x: level_data.start_x as f32 + 0.5,
             y: level_data.start_y as f32 + 0.5,
             dir_x: 1.,
             dir_y: 0.,
             goal_x: level_data.goal_x,
-            goal_y: level_data.goal_y
+            goal_y: level_data.goal_y,
         }
     }
 }
-
 
 #[derive(Resource)]
 pub struct SizeDate {
@@ -37,13 +35,13 @@ pub struct SizeDate {
     pub trans_y: f32,
 }
 impl SizeDate {
-    pub(crate) fn new(grid_x: i32, grid_y:i32, width:f32, height:f32) -> SizeDate {   
+    pub(crate) fn new(grid_x: i32, grid_y: i32, width: f32, height: f32) -> SizeDate {
         let img_width = 1600.;
-        let img_height = 900.; 
+        let img_height = 900.;
         let quad_width = img_width / grid_x as f32;
         let quad_height = img_height / grid_y as f32;
         let trans_x = (quad_width / 2.0) - (img_width / 2.0);
-        let trans_y = - (quad_height / 2.0) + (img_height / 2.0);
+        let trans_y = -(quad_height / 2.0) + (img_height / 2.0);
 
         SizeDate {
             grid_x,
@@ -52,8 +50,8 @@ impl SizeDate {
             screen_h: height,
             quad_height,
             quad_width,
-            trans_x ,
-            trans_y
+            trans_x,
+            trans_y,
         }
     }
 
@@ -79,6 +77,15 @@ impl GameData {
             map: Map::new(level_data),
             player: Player::new(level_data),
             dimension: Dimension::Light,
+        }
+    }
+}
+
+impl Dimension {
+    pub(crate) fn switch_dimension(&mut self) {
+        match self {
+            Dimension::Light => *self = Dimension::Dark,
+            Dimension::Dark => *self = Dimension::Light,
         }
     }
 }

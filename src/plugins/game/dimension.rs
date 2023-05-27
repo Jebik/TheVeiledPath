@@ -16,8 +16,10 @@ use bevy::{
 
 #[derive(Resource)]
 pub struct DimensionHandle {
-    light_handle: Handle<Image>,
-    dark_handle: Handle<Image>,
+    light_image: Handle<Image>,
+    dark_image: Handle<Image>,
+    light_material: Handle<ColorMaterial>,
+    dark_material: Handle<ColorMaterial>,
     light_layer: RenderLayers,
     dark_layer: RenderLayers,
     light_color: Color,
@@ -26,8 +28,8 @@ pub struct DimensionHandle {
 impl DimensionHandle {
     pub fn get_image_handle(&self, dimension: Dimension) -> Handle<Image> {
         match dimension {
-            Dimension::Light => self.light_handle.clone(),
-            Dimension::Dark => self.dark_handle.clone(),
+            Dimension::Light => self.light_image.clone(),
+            Dimension::Dark => self.dark_image.clone(),
         }
     }
     pub fn get_render_layer(&self, dimension: Dimension) -> RenderLayers {
@@ -42,19 +44,44 @@ impl DimensionHandle {
             Dimension::Dark => (self.light_color, self.dark_color),
         }
     }
+
+    pub(crate) fn get_material_handle(&self, dimension: Dimension) -> Handle<ColorMaterial> {
+        match dimension {
+            Dimension::Light => self.light_material.clone(),
+            Dimension::Dark => self.dark_material.clone(),
+        }
+    }
 }
 
-pub fn init_dimension(images: &mut Assets<Image>, image: Image) -> DimensionHandle {
-    let light_handle = images.add(image.clone());
-    let dark_handle = images.add(image);
+pub fn init_dimension(
+    images: &mut Assets<Image>, 
+    materials: &mut Assets<ColorMaterial>,
+    image: Image
+) -> DimensionHandle {
+    let light_image = images.add(image.clone());
+    let dark_image = images.add(image);
     let light_layer = RenderLayers::layer(1);
     let dark_layer = RenderLayers::layer(2);
     let light_color = Color::rgb(0.95, 0.95, 0.95);
     let dark_color = Color::rgb(0.05, 0.05, 0.05);
 
+    // Create a material from the image handle
+    let light_material = materials.add(ColorMaterial {
+        texture: Some(light_image.clone()),
+        ..Default::default()
+    });
+    // Create a material from the image handle
+    let dark_material = materials.add(ColorMaterial {
+        texture: Some(dark_image.clone()),
+        ..Default::default()
+    });
+
+
     let dimension_handle = DimensionHandle {
-        light_handle,
-        dark_handle,
+        light_image,
+        dark_image,
+        light_material,
+        dark_material,
         light_layer,
         dark_layer,
         light_color,

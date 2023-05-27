@@ -102,7 +102,7 @@ pub fn init_world(
     size_data: &SizeDate,
 ) {
     let image = init_target();
-    let dimension_handle = init_dimension(images, image);
+    let dimension_handle = init_dimension(images, materials, image);
 
     init_dimension_world(
         Dimension::Light,
@@ -123,7 +123,7 @@ pub fn init_world(
         meshes,
     );
 
-    spawn_full_screen_quad(commands, size_data, game_data, materials, meshes, &dimension_handle);
+    spawn_full_screen_quad(commands, size_data, game_data, meshes, &dimension_handle);
     commands.insert_resource(dimension_handle)
 }
 
@@ -131,19 +131,12 @@ fn spawn_full_screen_quad(
     commands: &mut Commands,
     size_data: &SizeDate,
     game_data: &GameData,
-    materials: &mut Assets<ColorMaterial>,
     meshes: &mut Assets<Mesh>,
     dimension: &DimensionHandle,
 ) {
-    let image_handle = dimension.get_image_handle(game_data.dimension);
+    let material_handle = dimension.get_material_handle(game_data.dimension);
     let camera = Camera2dBundle::default();
     commands.spawn(camera);
-
-    // Create a material from the image handle
-    let material_handle = materials.add(ColorMaterial {
-        texture: Some(image_handle),
-        ..Default::default()
-    });
 
     // Create the quad mesh
     let mesh = meshes
