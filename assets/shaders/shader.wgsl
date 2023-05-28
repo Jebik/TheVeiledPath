@@ -20,7 +20,6 @@ fn fragment(
     #import bevy_pbr::mesh_vertex_output
 ) -> @location(0) vec4<f32> {
     let world_color = textureSample(texture, txt_sampler, uv);
-
     var final_color = data.color;
     // Transform uv coordinates to world space
     var uv_world = uv * data.size_info;    
