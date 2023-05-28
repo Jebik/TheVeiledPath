@@ -3,6 +3,7 @@ struct ShaderData {
     player_direction: vec2<f32>,
     goal_position: vec2<f32>,
     size_info: vec2<f32>,
+    color: vec4<f32>,
 }
 
 @group(1) @binding(0)
@@ -26,8 +27,7 @@ fn fragment(
     let light_color = textureSample(light_texture, light_sampler, uv);
     let dark_color = textureSample(dark_texture, dark_sampler, uv);
 
-    /* WORKING ZONE
-    var final_color = vec4<f32>(1.0, 0.0, 0.0, 1.0); // Red
+    var final_color = data.color;
     // Transform uv coordinates to world space
     var uv_world = uv * data.size_info;    
     // Correct for the 0.5 offset
@@ -53,7 +53,6 @@ fn fragment(
         // Blend the final color with the light color based on the blend factor
         final_color = mix(final_color, light_color, blend_factor);
     }
-    */
 
-    return light_color;
+    return final_color;
 }

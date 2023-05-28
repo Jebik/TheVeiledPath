@@ -1,4 +1,4 @@
-use bevy::{render::render_resource::{AsBindGroup, ShaderRef, ShaderType}, reflect::{TypeUuid, Reflect}, prelude::{Vec2, Handle, Image}, sprite::Material2d};
+use bevy::{render::render_resource::{AsBindGroup, ShaderRef, ShaderType}, reflect::{TypeUuid, Reflect}, prelude::{Vec2, Handle, Image, Color}, sprite::Material2d};
 
 
 #[derive(AsBindGroup, TypeUuid, Debug, Clone)]
@@ -20,7 +20,8 @@ pub struct ShaderData {
     pub player_position: Vec2,
     pub player_direction: Vec2,
     pub goal_position: Vec2,
-    pub size_info: Vec2
+    pub size_info: Vec2,
+    pub color: Color
 }
 
 impl Material2d for DimensionMaterial {
