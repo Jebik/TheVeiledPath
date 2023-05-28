@@ -24,6 +24,8 @@ pub struct DimensionHandle {
     dark_layer: RenderLayers,
     light_color: Color,
     dark_color: Color,
+    light_dark: Color,
+    dark_light: Color
 }
 impl DimensionHandle {
     pub fn get_image_handle(&self, dimension: Dimension) -> Handle<Image> {
@@ -39,10 +41,10 @@ impl DimensionHandle {
         }
     }
 
-    pub fn get_color(&self, dimension: Dimension) -> Color {
+    pub fn get_color(&self, dimension: Dimension) -> (Color, Color) {
         match dimension {
-            Dimension::Light => self.dark_color,
-            Dimension::Dark => self.light_color,
+            Dimension::Light => (self.dark_color, self.dark_light),
+            Dimension::Dark => (self.light_color, self.light_dark)
         }
     }
     
@@ -73,7 +75,9 @@ pub fn init_dimension(
     let light_layer = RenderLayers::layer(1);
     let dark_layer = RenderLayers::layer(2);
     let light_color = Color::rgba(0.95, 0.95, 0.95, 1.);
+    let light_dark = Color::rgba(0.95, 0.95, 0.95, 0.2);
     let dark_color = Color::rgba(0.05, 0.05, 0.05, 1.);
+    let dark_light = Color::rgba(0.05, 0.05, 0.05, 0.2);
 
     let light_shader = materials_shader.add(DimensionMaterial {
         shader_data: ShaderData {
@@ -105,7 +109,9 @@ pub fn init_dimension(
         light_layer,
         dark_layer,
         light_color,
+        light_dark,
         dark_color,
+        dark_light
     };
 
     return dimension_handle;
@@ -122,19 +128,19 @@ pub fn init_dimension_world(
 ) {
     let image_handle = dimension_handle.get_image_handle(dimension);
     let render_layer = dimension_handle.get_render_layer(dimension);
-    let front_color = dimension_handle.get_color(dimension);
+    let (front_color, other_color) = dimension_handle.get_color(dimension);
     // Spawn the light camera
     let mut camera = Camera2dBundle::default();
     camera.camera.target = RenderTarget::Image(image_handle);
     camera.camera_2d.clear_color = ClearColorConfig::Custom(Color::rgba(0., 0., 0., 0.));
     commands.spawn((camera, render_layer)).insert(GameEntity);
 
-    let cells = match dimension {
-        Dimension::Light => &mut game_data.map.light_cells,
-        Dimension::Dark => &mut game_data.map.dark_cells,
+    let (dimension_cells, other_cells) = match dimension {
+        Dimension::Light => (&mut game_data.map.light_cells, &mut game_data.map.dark_cells),
+        Dimension::Dark => (&mut game_data.map.dark_cells, &mut game_data.map.light_cells)
     };
 
-    for cell in cells {
+    for cell in dimension_cells {
         let position = Vec2::new(cell.x, cell.y);
         match &cell.item_type {
             ItemType::Wall => {
@@ -183,6 +189,37 @@ pub fn init_dimension_world(
                 );
             },
             ItemType::None => ()
+        }
+    }
+
+    
+    for cell in other_cells {
+        let position = Vec2::new(cell.x, cell.y);
+        match &cell.item_type {
+            ItemType::Wall => {
+                spawn_quad(
+                    commands,
+                    &size_data,
+                    other_color,
+                    materials,
+                    meshes,
+                    render_layer,
+                    position,
+                );
+            }
+            ItemType::Door(d) => {
+                spawn_door(
+                    commands,
+                    &size_data,
+                    other_color,
+                    materials,
+                    meshes,
+                    render_layer,
+                    position,
+                    d
+                );
+            },
+            _ => ()
         }
     }
 
