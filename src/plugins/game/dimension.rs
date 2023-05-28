@@ -75,9 +75,9 @@ pub fn init_dimension(
     let light_layer = RenderLayers::layer(1);
     let dark_layer = RenderLayers::layer(2);
     let light_color = Color::rgba(0.95, 0.95, 0.95, 1.);
-    let light_dark = Color::rgba(0.95, 0.95, 0.95, 0.2);
+    let light_dark = Color::rgba(0.95, 0.95, 0.95, 0.1);
     let dark_color = Color::rgba(0.05, 0.05, 0.05, 1.);
-    let dark_light = Color::rgba(0.05, 0.05, 0.05, 0.2);
+    let dark_light = Color::rgba(0.05, 0.05, 0.05, 0.1);
 
     let light_shader = materials_shader.add(DimensionMaterial {
         shader_data: ShaderData {
