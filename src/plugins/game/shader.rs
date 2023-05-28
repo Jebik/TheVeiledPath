@@ -19,7 +19,8 @@ pub struct DimensionMaterial {
 pub struct ShaderData {
     pub player_position: Vec2,
     pub player_direction: Vec2,
-    pub goal_position: Vec2
+    pub goal_position: Vec2,
+    pub size_info: Vec2
 }
 
 impl Material2d for DimensionMaterial {

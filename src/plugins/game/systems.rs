@@ -12,7 +12,7 @@ use bevy::{
     ecs::system::{Commands, Res},
     prelude::{
         default, info, shape, Assets, Camera2dBundle, Component, Entity, EventReader, Image, Mesh,
-        Query, ResMut, Vec2, With, Color,
+        Query, ResMut, Vec2, With,
     },
     render::render_resource::{
         Extent3d, TextureDescriptor, TextureDimension, TextureFormat, TextureUsages,
@@ -125,7 +125,8 @@ pub fn init_world(
     size_data: &SizeDate,
 ) {
     let image = init_target();
-    let dimension_handle = init_dimension(images, materials_shader, image);
+
+    let dimension_handle = init_dimension(images, game_data, size_data, materials_shader, image);
 
     init_dimension_world(
         Dimension::Light,
@@ -159,9 +160,10 @@ fn spawn_full_screen_quad(
     dimension: &DimensionHandle,
 ) {
     let shader_handle = dimension.get_shader_handle(game_data.dimension);
+    let clear_color = dimension.get_clear_color(game_data.dimension);
 
-    let mut camera = Camera2dBundle::default();
-    camera.camera_2d.clear_color = ClearColorConfig::Custom(Color::rgba(0.95, 0.95, 0.95, 1.));
+    let mut camera = Camera2dBundle::default();    
+    camera.camera_2d.clear_color = ClearColorConfig::Custom(clear_color);
     commands.spawn(camera)
     .insert(FullScreen)
     .insert(GameEntity);

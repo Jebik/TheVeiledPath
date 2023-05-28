@@ -1,11 +1,12 @@
 struct ShaderData {
     player_position: vec2<f32>,
     player_direction: vec2<f32>,
-    goal_position: vec2<f32>
+    goal_position: vec2<f32>,
+    size_info: vec2<f32>,
 }
 
 @group(1) @binding(0)
-var<uniform> uniforms: ShaderData;
+var<uniform> data: ShaderData;
 
 @group(1) @binding(1)
 var light_texture: texture_2d<f32>;
@@ -25,39 +26,34 @@ fn fragment(
     let light_color = textureSample(light_texture, light_sampler, uv);
     let dark_color = textureSample(dark_texture, dark_sampler, uv);
 
-    var final_color = light_color;
-    // Calculate the distance from the player and the goal to the current pixel
-    let player_distance = distance(uniforms.player_position, uv);
-    let goal_distance = distance(uniforms.goal_position, uv);
-    
-    let threshold: f32 = 200.0;
-    // Check if we are in the circle range of the player or the goal
-    if(player_distance > threshold || goal_distance > threshold) {
-        final_color = light_color; // Make it lighter
-    }
-    else {
-        final_color = dark_color; // Make it darker
-    }
-/*
-    // Initial blending with 0.1 opacity for the dark dimension
-    let final_color = mix(light_color, dark_color, 0.1);
+    /* WORKING ZONE
+    var final_color = vec4<f32>(1.0, 0.0, 0.0, 1.0); // Red
+    // Transform uv coordinates to world space
+    var uv_world = uv * data.size_info;    
+    // Correct for the 0.5 offset
+    uv_world -= vec2<f32>(0.5, 0.5);
 
-    let light_intensity: f32 = 1.5;
-    let dark_intensity: f32 = 0.5;
-    let threshold: f32 = SOME_THRESHOLD; // Replace with your threshold
-
-    // Check if we are in the circle range of the player or the goal
-    if(player_distance > threshold && goal_distance > threshold) {
-        // We are not in range, darken or lighten the texture depending on the dimension
-        if (uniforms.dimension == 0u) {
-            final_color *= vec4<f32>(light_intensity, light_intensity, light_intensity, 1.0); // Make it lighter
-        } else {
-            final_color *= vec4<f32>(dark_intensity, dark_intensity, dark_intensity, 1.0); // Make it darker
-        }
+    let player_distance = distance(data.player_position, uv_world);
+    let goal_distance = distance(data.goal_position, uv_world);
+    // Draw a circle with a radius of 2.0 around player and goal
+    if (player_distance <= 1.5 || goal_distance <= 1.5) {
+        final_color = light_color;
     }
-*/
 
-    //return light_color;
-    //return vec4<f32>(1.0, 0.0, 0.0, 1.0); // Red color// * 0.9 + dark_color * 0.1;
-    return final_color;
+    // Create a directional cone for the player
+    let direction_to_pixel = normalize(uv_world - data.player_position);
+    let cosine_angle = dot(data.player_direction, direction_to_pixel);
+
+    // Calculate a blend factor based on the distance to the player, range is [0, 1]
+    let blend_factor = clamp(1.0 - ((player_distance - 1.5) / (8.0 - 1.5)), 0.0, 1.0);
+
+    // This will create a cone with an angle of about 60 degrees (cos(45 degrees) = 0.707)
+    // You can adjust this value to make the cone wider or narrower
+    if (cosine_angle > 0.707 && player_distance <= 8.0) {
+        // Blend the final color with the light color based on the blend factor
+        final_color = mix(final_color, light_color, blend_factor);
+    }
+    */
+
+    return light_color;
 }

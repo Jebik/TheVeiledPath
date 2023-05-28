@@ -39,10 +39,10 @@ impl DimensionHandle {
         }
     }
 
-    pub fn get_colors(&self, dimension: Dimension) -> (Color, Color) {
+    pub fn get_color(&self, dimension: Dimension) -> Color {
         match dimension {
-            Dimension::Light => (self.dark_color, self.light_color),
-            Dimension::Dark => (self.light_color, self.dark_color),
+            Dimension::Light => self.dark_color,
+            Dimension::Dark => self.light_color,
         }
     }
     
@@ -53,13 +53,18 @@ impl DimensionHandle {
         }
     }
 
-    pub(crate) fn get_clear_color(&self) -> Color {
-        Color::rgba(0., 0., 0., 0.)
+    pub(crate) fn get_clear_color(&self, dimension: Dimension) -> Color {
+        match dimension {
+            Dimension::Light => Color::rgba(1., 1., 1., 1.),
+            Dimension::Dark => Color::rgba(0., 0., 0., 1.),
+        }
     }
 }
 
 pub fn init_dimension(
     images: &mut Assets<Image>, 
+    game_data: &mut GameData,
+    size_data: &SizeDate,
     materials_shader: &mut Assets<DimensionMaterial>,
     image: Image
 ) -> DimensionHandle {
@@ -74,19 +79,21 @@ pub fn init_dimension(
         shader_data: ShaderData {
             player_position: Vec2::new(0., 0.),
             player_direction: Vec2::new(0., 0.),
-            goal_position: Vec2::new(0., 0.),
+            size_info: Vec2::new(size_data.grid_x as f32, size_data.grid_y as f32),
+            goal_position: Vec2::new(game_data.player.goal_x as f32, game_data.player.goal_y as f32),
         },
-        light_texture: dark_image.clone(),
-        dark_texture: light_image.clone()
+        light_texture: light_image.clone(),
+        dark_texture: dark_image.clone()
     });
     let dark_shader = materials_shader.add(DimensionMaterial {
         shader_data: ShaderData {
             player_position: Vec2::new(0., 0.),
             player_direction: Vec2::new(0., 0.),
-            goal_position: Vec2::new(0., 0.),
+            size_info: Vec2::new(size_data.grid_x as f32, size_data.grid_y as f32),
+            goal_position: Vec2::new(game_data.player.goal_x as f32, game_data.player.goal_y as f32),
         },
-        light_texture: light_image.clone(),
-        dark_texture: dark_image.clone()
+        light_texture: dark_image.clone(),
+        dark_texture: light_image.clone()
     });
     let dimension_handle = DimensionHandle {
         light_image,
@@ -113,11 +120,11 @@ pub fn init_dimension_world(
 ) {
     let image_handle = dimension_handle.get_image_handle(dimension);
     let render_layer = dimension_handle.get_render_layer(dimension);
-    let (front_color, back_color) = dimension_handle.get_colors(dimension);
+    let front_color = dimension_handle.get_color(dimension);
     // Spawn the light camera
     let mut camera = Camera2dBundle::default();
     camera.camera.target = RenderTarget::Image(image_handle);
-    camera.camera_2d.clear_color = ClearColorConfig::Custom(back_color);
+    camera.camera_2d.clear_color = ClearColorConfig::Custom(Color::rgba(0., 0., 0., 0.));
     commands.spawn((camera, render_layer)).insert(GameEntity);
 
     let cells = match dimension {
