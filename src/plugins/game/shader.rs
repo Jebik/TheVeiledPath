@@ -8,10 +8,7 @@ pub struct DimensionMaterial {
     pub shader_data: ShaderData,
     #[texture(1)]
     #[sampler(2)]
-    pub light_texture: Handle<Image>,
-    #[texture(3)]
-    #[sampler(4)]
-    pub dark_texture: Handle<Image>,
+    pub texture: Handle<Image>,
 }
 
 #[derive(Reflect, TypeUuid, Debug, Clone, ShaderType)]

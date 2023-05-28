@@ -87,8 +87,7 @@ pub fn init_dimension(
             goal_position: Vec2::new(game_data.player.goal_x as f32, game_data.player.goal_y as f32),
             color: Color::rgba(0.05, 0.05, 0.05, 1.)
         },
-        light_texture: light_image.clone(),
-        dark_texture: dark_image.clone()
+        texture: light_image.clone()
     });
     let dark_shader = materials_shader.add(DimensionMaterial {
         shader_data: ShaderData {
@@ -98,8 +97,7 @@ pub fn init_dimension(
             goal_position: Vec2::new(game_data.player.goal_x as f32, game_data.player.goal_y as f32),
             color: Color::rgba(0.95, 0.95, 0.95, 1.)
         },
-        light_texture: dark_image.clone(),
-        dark_texture: light_image.clone()
+        texture: dark_image.clone()
     });
     let dimension_handle = DimensionHandle {
         light_image,
