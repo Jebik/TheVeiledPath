@@ -81,8 +81,8 @@ pub fn init_dimension(
 
     let light_shader = materials_shader.add(DimensionMaterial {
         shader_data: ShaderData {
-            player_position: Vec2::new(0., 0.),
-            player_direction: Vec2::new(0., 0.),
+            player_position: Vec2::new(game_data.player.x, game_data.player.y),
+            player_direction: Vec2::new(1., 0.),
             size_info: Vec2::new(size_data.grid_x as f32, size_data.grid_y as f32),
             goal_position: Vec2::new(game_data.player.goal_x as f32, game_data.player.goal_y as f32),
             color: Color::rgba(0.05, 0.05, 0.05, 1.)
