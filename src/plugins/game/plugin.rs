@@ -1,6 +1,8 @@
 use bevy::prelude::{Plugin, App, IntoSystemConfig, IntoSystemAppConfig, OnExit};
 use bevy::ecs::schedule::{OnEnter,OnUpdate};
+use bevy::sprite::Material2dPlugin;
 use super::physic::physic_system;
+use super::shader::DimensionMaterial;
 use super::systems::{setup_game, window_resize_system, cleanup_game};
 use super::input::{setup_input, move_system};
 use super::tutorial::tuto_system;
@@ -11,7 +13,8 @@ pub struct GamePlugin;
 
 
 impl Plugin for GamePlugin {
-    fn build(&self, app: &mut App) {
+    fn build(&self, app: &mut App) {        
+        app.add_plugin(Material2dPlugin::<DimensionMaterial>::default());
         app.add_startup_system(setup_input);
         app.add_system(setup_game.in_schedule(OnEnter(GameState::Game)));
         app.add_system(move_system.in_set(OnUpdate(GameState::Game)));

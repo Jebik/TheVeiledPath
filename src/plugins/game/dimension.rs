@@ -20,6 +20,8 @@ pub struct DimensionHandle {
     dark_image: Handle<Image>,
     light_material: Handle<ColorMaterial>,
     dark_material: Handle<ColorMaterial>,
+    //light_shader: Handle<DimensionMaterial>,
+    //dark_shader: Handle<DimensionMaterial>,
     light_layer: RenderLayers,
     dark_layer: RenderLayers,
     light_color: Color,
@@ -51,11 +53,19 @@ impl DimensionHandle {
             Dimension::Dark => self.dark_material.clone(),
         }
     }
+/*
+    pub(crate) fn get_shader_handle(&self, dimension: Dimension) -> Handle<DimensionMaterial> {
+        match dimension {
+            Dimension::Light => self.light_shader.clone(),
+            Dimension::Dark => self.dark_shader.clone(),
+        }
+    } */
 }
 
 pub fn init_dimension(
     images: &mut Assets<Image>, 
     materials: &mut Assets<ColorMaterial>,
+    //materials_shader: &mut Assets<DimensionMaterial>,
     image: Image
 ) -> DimensionHandle {
     let light_image = images.add(image.clone());
@@ -76,12 +86,33 @@ pub fn init_dimension(
         ..Default::default()
     });
 
-
+    /*
+    let light_shader = materials_shader.add(DimensionMaterial {
+        uniforms: ShaderData {
+            player_position: Vec2::new(0., 0.),
+            player_direction: Vec2::new(0., 0.),
+            goal_position: Vec2::new(0., 0.),
+        },
+        light_texture: light_image.clone(),
+        dark_texture: dark_image.clone()
+    });
+    let dark_shader = materials_shader.add(DimensionMaterial {
+        uniforms: ShaderData {
+            player_position: Vec2::new(0., 0.),
+            player_direction: Vec2::new(0., 0.),
+            goal_position: Vec2::new(0., 0.),
+        },
+        light_texture: light_image.clone(),
+        dark_texture: dark_image.clone()
+    });
+    */
     let dimension_handle = DimensionHandle {
         light_image,
         dark_image,
         light_material,
         dark_material,
+        //light_shader,
+        //dark_shader,
         light_layer,
         dark_layer,
         light_color,
@@ -218,7 +249,6 @@ fn spawn_door(
     // Calculate the position of the quad relative to the window size
     let quad_x = size_date.get_world_x(position.x);
     let quad_y = size_date.get_world_y(position.y);
-    let grey = Color::rgb(0.5, 0.5, 0.5);
 
     commands
         .spawn(MaterialMesh2dBundle {
@@ -228,7 +258,7 @@ fn spawn_door(
                 size_date.quad_height,
                 0.,
             )),
-            material: materials.add(ColorMaterial::from(grey)),
+            material: materials.add(ColorMaterial::from(color)),
             ..default()
         })
         .insert(layer)
