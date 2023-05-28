@@ -218,6 +218,7 @@ fn spawn_door(
     // Calculate the position of the quad relative to the window size
     let quad_x = size_date.get_world_x(position.x);
     let quad_y = size_date.get_world_y(position.y);
+    let grey = Color::rgb(0.5, 0.5, 0.5);
 
     commands
         .spawn(MaterialMesh2dBundle {
@@ -227,7 +228,7 @@ fn spawn_door(
                 size_date.quad_height,
                 0.,
             )),
-            material: materials.add(ColorMaterial::from(color)),
+            material: materials.add(ColorMaterial::from(grey)),
             ..default()
         })
         .insert(layer)

@@ -16,7 +16,7 @@ use bevy::{
             Extent3d, TextureDescriptor, TextureDimension, TextureFormat, TextureUsages,
         },
     },
-    sprite::{ColorMaterial, MaterialMesh2dBundle, Mesh2dHandle},
+    sprite::{ColorMaterial, MaterialMesh2dBundle, Mesh2dHandle, Material2d},
     window::{Window, WindowResized},
 };
 
@@ -32,6 +32,7 @@ pub fn cleanup_game(
 pub fn setup_game(
     mut commands: Commands,
     mut materials: ResMut<Assets<ColorMaterial>>,
+   // mut materials_shader: ResMut<Assets<CustomMaterial>>,
     mut images: ResMut<Assets<Image>>,
     mut meshes: ResMut<Assets<Mesh>>,
     windows: Query<&Window>,
@@ -66,6 +67,7 @@ pub fn setup_game(
     init_world(
         &mut commands,
         &mut materials,
+        //&mut materials_shader,
         &mut images,
         &mut meshes,
         &mut game_data,
@@ -117,6 +119,7 @@ pub fn init_target() -> Image {
 pub fn init_world(
     commands: &mut Commands,
     materials: &mut Assets<ColorMaterial>,
+    //materials_shader: &mut Assets<CustomMaterial>,
     images: &mut Assets<Image>,
     meshes: &mut Assets<Mesh>,
     game_data: &mut GameData,
@@ -144,7 +147,13 @@ pub fn init_world(
         meshes,
     );
 
-    spawn_full_screen_quad(commands, size_data, game_data, meshes, &dimension_handle);
+    spawn_full_screen_quad(
+        commands, 
+        size_data, 
+        game_data, 
+        meshes, 
+        //materials_shader, 
+        &dimension_handle);
     commands.insert_resource(dimension_handle)
 }
 
@@ -153,6 +162,7 @@ fn spawn_full_screen_quad(
     size_data: &SizeDate,
     game_data: &GameData,
     meshes: &mut Assets<Mesh>,
+    //materials_shader: &mut Assets<CustomMaterial>,
     dimension: &DimensionHandle,
 ) {
     let material_handle = dimension.get_material_handle(game_data.dimension);
@@ -167,6 +177,24 @@ fn spawn_full_screen_quad(
         }))
         .into();
 
+/*
+/// Render pipeline data for a given [`Material2d`]
+#[derive(Resource)]
+pub struct Material2dPipeline<M: Material2d> {
+    pub mesh2d_pipeline: Mesh2dPipeline,
+    pub material2d_layout: BindGroupLayout,
+    pub vertex_shader: Option<Handle<Shader>>,
+    pub fragment_shader: Option<Handle<Shader>>,
+    marker: PhantomData<M>,
+}
+    let image = dimension.get_image_handle(game_data.dimension);
+
+    let material = materials_shader.add(CustomMaterial {
+        color: Color::BLUE,
+        color_texture: image,
+    });
+    */
+
     commands
         .spawn(MaterialMesh2dBundle {
             mesh: mesh,
@@ -176,6 +204,49 @@ fn spawn_full_screen_quad(
         .insert(FullScreen)
         .insert(GameEntity);
 }
+
+/*
+/// The Material trait is very configurable, but comes with sensible defaults for all methods.
+/// You only need to implement functions for features that need non-default behavior. See the Material api docs for details!
+impl Material2d for CustomMaterial {
+    fn fragment_shader() -> ShaderRef {
+        "shaders/custom_material.wgsl".into()
+    }
+
+    fn vertex_shader() -> bevy::render::render_resource::ShaderRef {
+        bevy::render::render_resource::ShaderRef::Default
+    }
+
+    fn specialize(
+        descriptor: &mut bevy::render::render_resource::RenderPipelineDescriptor,
+        layout: &bevy::render::mesh::MeshVertexBufferLayout,
+        key: bevy::sprite::Material2dKey<Self>,
+    ) -> Result<(), bevy::render::render_resource::SpecializedMeshPipelineError> {
+        Ok(())
+    }
+}
+
+// This is the struct that will be passed to your shader
+#[derive(AsBindGroup, TypeUuid, Debug, Clone)]
+#[uuid = "f690fdae-d598-45ab-8225-97e2a3f056e0"]
+pub struct CustomMaterial {
+    #[uniform(0)]
+    color: Color,
+    #[texture(1)]
+    color_texture: Handle<Image>
+}
+
+impl CustomMaterial {
+    
+}
+
+
+
+*/
+
+
+
+
 
 pub fn window_resize_system(
     mut size_data: ResMut<SizeDate>,
