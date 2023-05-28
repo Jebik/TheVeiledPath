@@ -1,7 +1,5 @@
 mod map;
-mod player;
 mod plugins;
-mod game;
 
 use bevy::prelude::*;
 use map::parser::{parse_map, MapSource, MapFile};

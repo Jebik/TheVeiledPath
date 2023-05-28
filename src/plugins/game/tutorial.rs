@@ -92,7 +92,4 @@ pub fn init_tuto(
     tutorial.add_message("But maybe one of the wall is actually a closed door. Do you see the grey button in the top of you?".to_string(), 4);
     tutorial.add_message("No door open? Are you sure you are in right dimension?".to_string(), 5);
     tutorial.add_message("Easy Right? This was only the tutorial real map is a bit more complexe".to_string(), 7);
-    //IF  SHADER
-    //tutorial.add_message("Easy Right? This was only the tutorial".to_string(), 7);
-    //tutorial.add_message("You didn't think you would see all map all the time right?".to_string(), 7);
 }
