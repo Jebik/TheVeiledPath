@@ -1,11 +1,11 @@
 use bevy::{
-    prelude::{GamepadAxisType, GamepadButtonType, KeyCode, Query, Res, ResMut, Transform, With, Handle},
-    time::Time, sprite::{ColorMaterial},
+    prelude::{GamepadAxisType, GamepadButtonType, KeyCode, Query, Res, ResMut, Transform, With, Handle, Camera2d, Assets, Vec2},
+    time::Time, core_pipeline::clear_color::ClearColorConfig,
 };
 
-use crate::{plugins::input::types::{Action, InputData, InputMap}};
+use crate::{plugins::input::types::{Action, InputData, InputMap}, map::json_types::Dimension};
 
-use super::{systems::{PlayerPosition, FullScreen}, engine::{GameData, SizeDate}, dimension::DimensionHandle, tutorial::Tutorial};
+use super::{systems::{PlayerPosition, FullScreen}, engine::{GameData, SizeDate}, dimension::DimensionHandle, tutorial::Tutorial, shader::{DimensionMaterial, ShaderData}};
 
 pub fn setup_input(mut input_map: ResMut<InputMap>) {
     // bind keyboard keys
@@ -31,8 +31,10 @@ pub fn move_system(
     dimension: Res<DimensionHandle>,
     mut game_data: ResMut<GameData>,
     mut tutorial: ResMut<Tutorial>,
+    mut materials: ResMut<Assets<DimensionMaterial>>,
     mut player_query: Query<&mut Transform, With<PlayerPosition>>,
-    mut texture_query: Query<&mut Handle<ColorMaterial>, With<FullScreen>>,
+    mut texture_query: Query<&mut Handle<DimensionMaterial>, With<FullScreen>>,
+    mut camera_query: Query<&mut Camera2d, With<FullScreen>>,   
 ) {
     tutorial.check_message(&mut game_data);
     if tutorial.current_message_index.is_some() {        
@@ -48,17 +50,32 @@ pub fn move_system(
         }
         game_data.player.x += move_x * 2.;
         game_data.player.y += move_y * 2.;
+        let world_x = size_date.get_world_x(game_data.player.x);
+        let world_y = size_date.get_world_y(game_data.player.y);
             
         for mut transform in player_query.iter_mut() {
-            let world_x = size_date.get_world_x(game_data.player.x);
-            let world_y = size_date.get_world_y(game_data.player.y);
             transform.translation.x = world_x;
             transform.translation.y = world_y;
         }
-            
+        let light_handle = dimension.get_shader_handle(Dimension::Light);
+        let dark_handle = dimension.get_shader_handle(Dimension::Dark);
+
+        let light_material = materials.get_mut(&light_handle).unwrap();
+        light_material.shader_data.player_position = Vec2::new(world_x, world_y);
+        light_material.shader_data.player_direction = Vec2::new(game_data.player.dir_x, game_data.player.dir_y);
+
+        let dark_material = materials.get_mut(&dark_handle).unwrap();
+        dark_material.shader_data.player_position = Vec2::new(world_x, world_y);
+        dark_material.shader_data.player_direction = Vec2::new(game_data.player.dir_x, game_data.player.dir_y);
+
         if input_data.button_a {
             if game_data.dimension_enabled {
-                switch_dimension(&mut game_data, &dimension, &mut texture_query);
+                switch_dimension(
+                    &mut game_data, 
+                    &dimension, 
+                    &mut texture_query,
+                    &mut camera_query
+                );
             }
         }
     }
@@ -67,12 +84,17 @@ pub fn move_system(
 fn switch_dimension(
     game_data: &mut GameData,
     dimension: &DimensionHandle,
-    texture_query: &mut Query<&mut Handle<ColorMaterial>, With<FullScreen>>,
+    texture_query: &mut Query<&mut Handle<DimensionMaterial>, With<FullScreen>>,
+    camera_query: &mut Query<&mut Camera2d, With<FullScreen>>,    
 ) {
     game_data.dimension.switch_dimension();
 
-    let mew_material_handle = dimension.get_material_handle(game_data.dimension);
+    let mew_shader_handle = dimension.get_shader_handle(game_data.dimension);
+    let mew_clear_color = dimension.get_clear_color();
     for mut material_handle in texture_query.iter_mut() {
-        *material_handle = mew_material_handle.clone();
+        *material_handle = mew_shader_handle.clone();
+    }
+    for mut camera in camera_query.iter_mut() {
+        camera.clear_color = ClearColorConfig::Custom(mew_clear_color);
     }
 }

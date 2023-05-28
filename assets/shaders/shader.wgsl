@@ -24,18 +24,23 @@ fn fragment(
 ) -> @location(0) vec4<f32> {
     let light_color = textureSample(light_texture, light_sampler, uv);
     let dark_color = textureSample(dark_texture, dark_sampler, uv);
-    let final_color = mix(light_color, dark_color, 0.01);
-    return final_color;
-/*
-    // Getting colors from the two textures
-    let light_color = textureSample(light_texture, default_sampler, uv);
-    let dark_color = textureSample(dark_texture, default_sampler, uv);
 
-    // Initial blending with 0.1 opacity for the dark dimension
-    let final_color = mix(light_color, dark_color, 0.1);
+    var final_color = light_color;
     // Calculate the distance from the player and the goal to the current pixel
     let player_distance = distance(uniforms.player_position, uv);
     let goal_distance = distance(uniforms.goal_position, uv);
+    
+    let threshold: f32 = 200.0;
+    // Check if we are in the circle range of the player or the goal
+    if(player_distance > threshold || goal_distance > threshold) {
+        final_color = light_color; // Make it lighter
+    }
+    else {
+        final_color = dark_color; // Make it darker
+    }
+/*
+    // Initial blending with 0.1 opacity for the dark dimension
+    let final_color = mix(light_color, dark_color, 0.1);
 
     let light_intensity: f32 = 1.5;
     let dark_intensity: f32 = 0.5;
@@ -53,5 +58,6 @@ fn fragment(
 */
 
     //return light_color;
-    //return vec4<f32>(1.0, 0.0, 0.0, 1.0); // Red color
+    //return vec4<f32>(1.0, 0.0, 0.0, 1.0); // Red color// * 0.9 + dark_color * 0.1;
+    return final_color;
 }

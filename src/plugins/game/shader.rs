@@ -5,7 +5,7 @@ use bevy::{render::render_resource::{AsBindGroup, ShaderRef, ShaderType}, reflec
 #[uuid = "f690fdae-d598-45ab-8225-97e2a3f056e0"]
 pub struct DimensionMaterial {
     #[uniform(0)]
-    pub uniforms: ShaderData,
+    pub shader_data: ShaderData,
     #[texture(1)]
     #[sampler(2)]
     pub light_texture: Handle<Image>,

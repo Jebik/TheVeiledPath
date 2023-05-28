@@ -1,7 +1,7 @@
 use super::{
     engine::{GameData, SizeDate},
     map::{ItemType, Door, Key},
-    systems::{PlayerPosition, GameEntity, DoorId},
+    systems::{PlayerPosition, GameEntity, DoorId}, shader::{DimensionMaterial, ShaderData},
 };
 use crate::map::json_types::Dimension;
 use bevy::{
@@ -18,10 +18,8 @@ use bevy::{
 pub struct DimensionHandle {
     light_image: Handle<Image>,
     dark_image: Handle<Image>,
-    light_material: Handle<ColorMaterial>,
-    dark_material: Handle<ColorMaterial>,
-    //light_shader: Handle<DimensionMaterial>,
-    //dark_shader: Handle<DimensionMaterial>,
+    light_shader: Handle<DimensionMaterial>,
+    dark_shader: Handle<DimensionMaterial>,
     light_layer: RenderLayers,
     dark_layer: RenderLayers,
     light_color: Color,
@@ -40,64 +38,49 @@ impl DimensionHandle {
             Dimension::Dark => self.dark_layer,
         }
     }
+
     pub fn get_colors(&self, dimension: Dimension) -> (Color, Color) {
         match dimension {
             Dimension::Light => (self.dark_color, self.light_color),
             Dimension::Dark => (self.light_color, self.dark_color),
         }
     }
-
-    pub(crate) fn get_material_handle(&self, dimension: Dimension) -> Handle<ColorMaterial> {
-        match dimension {
-            Dimension::Light => self.light_material.clone(),
-            Dimension::Dark => self.dark_material.clone(),
-        }
-    }
-/*
+    
     pub(crate) fn get_shader_handle(&self, dimension: Dimension) -> Handle<DimensionMaterial> {
         match dimension {
             Dimension::Light => self.light_shader.clone(),
             Dimension::Dark => self.dark_shader.clone(),
         }
-    } */
+    }
+
+    pub(crate) fn get_clear_color(&self) -> Color {
+        Color::rgba(0., 0., 0., 0.)
+    }
 }
 
 pub fn init_dimension(
     images: &mut Assets<Image>, 
-    materials: &mut Assets<ColorMaterial>,
-    //materials_shader: &mut Assets<DimensionMaterial>,
+    materials_shader: &mut Assets<DimensionMaterial>,
     image: Image
 ) -> DimensionHandle {
     let light_image = images.add(image.clone());
     let dark_image = images.add(image);
     let light_layer = RenderLayers::layer(1);
     let dark_layer = RenderLayers::layer(2);
-    let light_color = Color::rgb(0.95, 0.95, 0.95);
-    let dark_color = Color::rgb(0.05, 0.05, 0.05);
+    let light_color = Color::rgba(0.95, 0.95, 0.95, 1.);
+    let dark_color = Color::rgba(0.05, 0.05, 0.05, 1.);
 
-    // Create a material from the image handle
-    let light_material = materials.add(ColorMaterial {
-        texture: Some(light_image.clone()),
-        ..Default::default()
-    });
-    // Create a material from the image handle
-    let dark_material = materials.add(ColorMaterial {
-        texture: Some(dark_image.clone()),
-        ..Default::default()
-    });
-
-    /*
     let light_shader = materials_shader.add(DimensionMaterial {
-        uniforms: ShaderData {
+        shader_data: ShaderData {
             player_position: Vec2::new(0., 0.),
             player_direction: Vec2::new(0., 0.),
             goal_position: Vec2::new(0., 0.),
         },
-        light_texture: light_image.clone(),
-        dark_texture: dark_image.clone()
+        light_texture: dark_image.clone(),
+        dark_texture: light_image.clone()
     });
     let dark_shader = materials_shader.add(DimensionMaterial {
-        uniforms: ShaderData {
+        shader_data: ShaderData {
             player_position: Vec2::new(0., 0.),
             player_direction: Vec2::new(0., 0.),
             goal_position: Vec2::new(0., 0.),
@@ -105,14 +88,11 @@ pub fn init_dimension(
         light_texture: light_image.clone(),
         dark_texture: dark_image.clone()
     });
-    */
     let dimension_handle = DimensionHandle {
         light_image,
         dark_image,
-        light_material,
-        dark_material,
-        //light_shader,
-        //dark_shader,
+        light_shader,
+        dark_shader,
         light_layer,
         dark_layer,
         light_color,

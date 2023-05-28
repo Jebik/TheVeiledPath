@@ -1,29 +1,27 @@
-use super::{engine::GameData, dimension::{init_dimension_world, init_dimension, DimensionHandle}, tutorial::{Tutorial, init_tuto}, shader::{DimensionMaterial, ShaderData}};
+use super::{
+    dimension::{init_dimension, init_dimension_world, DimensionHandle},
+    engine::GameData,
+    shader::DimensionMaterial,
+    tutorial::{init_tuto, Tutorial},
+};
 use crate::{
     map::{json_types::Dimension, map_manager::MapManager},
-    plugins::{
-        game::{engine::SizeDate},
-        menu::plugin::LevelChoice,
-    },
+    plugins::{game::engine::SizeDate, menu::plugin::LevelChoice},
 };
 use bevy::{
     ecs::system::{Commands, Res},
     prelude::{
-        default, info, shape, Assets, Camera2dBundle, Component, EventReader, Image, Mesh, Query, ResMut, Vec2, With, Entity, Shader,
+        default, info, shape, Assets, Camera2dBundle, Component, Entity, EventReader, Image, Mesh,
+        Query, ResMut, Vec2, With, Color,
     },
-    render::{
-        render_resource::{
-            Extent3d, TextureDescriptor, TextureDimension, TextureFormat, TextureUsages,
-        },
+    render::render_resource::{
+        Extent3d, TextureDescriptor, TextureDimension, TextureFormat, TextureUsages,
     },
     sprite::{ColorMaterial, MaterialMesh2dBundle, Mesh2dHandle},
-    window::{Window, WindowResized},
+    window::{Window, WindowResized}, core_pipeline::clear_color::ClearColorConfig,
 };
 
-pub fn cleanup_game(
-    mut commands: Commands, 
-    query: Query<Entity, With<GameEntity>>
-) {
+pub fn cleanup_game(mut commands: Commands, query: Query<Entity, With<GameEntity>>) {
     for entity in query.iter() {
         commands.entity(entity).despawn();
     }
@@ -31,7 +29,6 @@ pub fn cleanup_game(
 
 pub fn setup_game(
     mut commands: Commands,
-    mut shaders: ResMut<Assets<Shader>>,
     mut materials: ResMut<Assets<ColorMaterial>>,
     mut materials_shader: ResMut<Assets<DimensionMaterial>>,
     mut images: ResMut<Assets<Image>>,
@@ -55,7 +52,7 @@ pub fn setup_game(
     let mut tutorial = Tutorial::new();
     match *level {
         LevelChoice::Tutorial => init_tuto(&mut game_data, &mut tutorial),
-        _ => ()
+        _ => (),
     };
 
     let window = windows.single();
@@ -128,11 +125,7 @@ pub fn init_world(
     size_data: &SizeDate,
 ) {
     let image = init_target();
-    let dimension_handle = init_dimension(
-        images, 
-        materials, 
-        //materials_shader,
-        image);
+    let dimension_handle = init_dimension(images, materials_shader, image);
 
     init_dimension_world(
         Dimension::Light,
@@ -152,14 +145,8 @@ pub fn init_world(
         materials,
         meshes,
     );
-    
-    spawn_full_screen_quad(
-        commands, 
-        size_data, 
-        game_data, 
-        meshes,
-        materials_shader,
-        &dimension_handle);
+
+    spawn_full_screen_quad(commands, size_data, game_data, meshes, &dimension_handle);
 
     commands.insert_resource(dimension_handle)
 }
@@ -169,27 +156,15 @@ fn spawn_full_screen_quad(
     size_data: &SizeDate,
     game_data: &GameData,
     meshes: &mut Assets<Mesh>,
-    materials_shader: &mut Assets<DimensionMaterial>,    
     dimension: &DimensionHandle,
 ) {
+    let shader_handle = dimension.get_shader_handle(game_data.dimension);
 
-    //let shader_handle = dimension.get_shader_handle(game_data.dimension);
-    let light_txt = dimension.get_image_handle(Dimension::Light);
-    let dark_txt = dimension.get_image_handle(Dimension::Dark);
-
-    let shader = materials_shader.add(DimensionMaterial {
-        uniforms: ShaderData {
-            player_position: Vec2::new(0., 0.),
-            player_direction: Vec2::new(0., 0.),
-            goal_position: Vec2::new(0., 0.),
-        },
-        light_texture: light_txt.clone(),
-        dark_texture: dark_txt.clone()
-    });
-
-
-    let camera = Camera2dBundle::default();
-    commands.spawn(camera).insert(GameEntity);
+    let mut camera = Camera2dBundle::default();
+    camera.camera_2d.clear_color = ClearColorConfig::Custom(Color::rgba(0.95, 0.95, 0.95, 1.));
+    commands.spawn(camera)
+    .insert(FullScreen)
+    .insert(GameEntity);
     // Create the quad mesh
     let mesh = meshes
         .add(Mesh::from(shape::Quad {
@@ -197,12 +172,15 @@ fn spawn_full_screen_quad(
             flip: false,
         }))
         .into();
-        
-     commands.spawn(MaterialMesh2dBundle {
-        material: shader,
-        mesh: mesh,
-        ..Default::default()
-    });
+
+    commands
+        .spawn(MaterialMesh2dBundle {
+            material: shader_handle,
+            mesh: mesh,
+            ..Default::default()
+        })
+        .insert(FullScreen)
+        .insert(GameEntity);
 }
 
 pub fn window_resize_system(
