@@ -174,7 +174,8 @@ fn spawn_full_screen_quad(
 ) {
 
     //let shader_handle = dimension.get_shader_handle(game_data.dimension);
-    let text = dimension.get_image_handle(game_data.dimension);
+    let light_txt = dimension.get_image_handle(Dimension::Light);
+    let dark_txt = dimension.get_image_handle(Dimension::Dark);
 
     let shader = materials_shader.add(DimensionMaterial {
         uniforms: ShaderData {
@@ -182,8 +183,8 @@ fn spawn_full_screen_quad(
             player_direction: Vec2::new(0., 0.),
             goal_position: Vec2::new(0., 0.),
         },
-        light_texture: text.clone(),
-        dark_texture: text.clone()
+        light_texture: light_txt.clone(),
+        dark_texture: dark_txt.clone()
     });
 
 

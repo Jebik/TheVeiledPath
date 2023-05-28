@@ -7,8 +7,10 @@ pub struct DimensionMaterial {
     #[uniform(0)]
     pub uniforms: ShaderData,
     #[texture(1)]
+    #[sampler(2)]
     pub light_texture: Handle<Image>,
-    #[texture(2)]
+    #[texture(3)]
+    #[sampler(4)]
     pub dark_texture: Handle<Image>,
 }
 

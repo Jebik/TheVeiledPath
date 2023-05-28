@@ -9,18 +9,23 @@ var<uniform> uniforms: ShaderData;
 
 @group(1) @binding(1)
 var light_texture: texture_2d<f32>;
-
 @group(1) @binding(2)
-var dark_texture: texture_2d<f32>;
+var light_sampler: sampler;
 
 @group(1) @binding(3)
-var default_sampler: sampler;
+var dark_texture: texture_2d<f32>;
+@group(1) @binding(4)
+var dark_sampler: sampler;
+
 
 @fragment
 fn fragment(
     #import bevy_pbr::mesh_vertex_output
 ) -> @location(0) vec4<f32> {
-    let light_color = textureSample(light_texture, uv);
+    let light_color = textureSample(light_texture, light_sampler, uv);
+    let dark_color = textureSample(dark_texture, dark_sampler, uv);
+    let final_color = mix(light_color, dark_color, 0.01);
+    return final_color;
 /*
     // Getting colors from the two textures
     let light_color = textureSample(light_texture, default_sampler, uv);
@@ -47,6 +52,6 @@ fn fragment(
     }
 */
 
-    return light_color;
+    //return light_color;
     //return vec4<f32>(1.0, 0.0, 0.0, 1.0); // Red color
 }
