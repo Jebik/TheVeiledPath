@@ -86,8 +86,8 @@ pub fn init_tuto(
     tutorial.add_message("A wall is blocking you if you touch it you die".to_string(), 2);
     tutorial.add_message("But you are lucky you can change dimension by pressing A or Space. Try It".to_string(), 2);
     tutorial.add_message("Be carefull the wall are still in the other dimension.".to_string(), 3);
-    tutorial.add_message("If you switch back inside a wall you die".to_string(), 4);
-    tutorial.add_message("You can see other dimension here every thing a litle lighter is a wall in the other dimmension".to_string(), 4);
+    tutorial.add_message("If you switch back inside a wall you die".to_string(), 3);
+    tutorial.add_message("You can see other dimension here every thing a litle lighter is a wall in the other dimmension".to_string(), 3);
     tutorial.add_message("Here the wall is present in both dimension you can't pass it".to_string(), 5);
     tutorial.add_message("But maybe one of the wall is actually a closed door. Do you see the grey button in the top of you?".to_string(), 5);
     tutorial.add_message("No door open? Are you sure you are in right dimension?".to_string(), 6);
