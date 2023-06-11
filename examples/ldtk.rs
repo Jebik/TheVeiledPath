@@ -1,4 +1,5 @@
-use ldtk_rust::{Project, EntityInstance};
+use ldtk_rust::{Project};
+use map::MapData;
 
 // Loads an LDtk Project file along with any external level files
 // that it references.
@@ -22,4 +23,15 @@ fn main() {
             println!("{:?}: {}", [gv.0 / width, gv.0 % width], gv.1);
         }
     }
+
+    let mapData = MapData { 
+        name: String::new(),
+        size: 0,
+        start_x: 0,
+        start_y: 0,
+        goal_x: 0,
+        goal_y: 0,
+        walls: Vec::new(),
+        doors: Vec::new(),
+        keys: Vec::new() };
 }

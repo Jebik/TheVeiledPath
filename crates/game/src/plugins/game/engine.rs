@@ -1,5 +1,5 @@
 use super::map::Map;
-use crate::map::json_types::{Dimension, MapData};
+use map_shared::{Dimension, MapData};
 use bevy::prelude::Resource;
 
 pub struct Player {
@@ -79,15 +79,6 @@ impl GameData {
             player: Player::new(level_data),
             dimension: Dimension::Light,
             dimension_enabled: true,
-        }
-    }
-}
-
-impl Dimension {
-    pub(crate) fn switch_dimension(&mut self) {
-        match self {
-            Dimension::Light => *self = Dimension::Dark,
-            Dimension::Dark => *self = Dimension::Light,
         }
     }
 }

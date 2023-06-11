@@ -3,7 +3,8 @@ use bevy::{
     time::Time, core_pipeline::clear_color::ClearColorConfig,
 };
 
-use crate::{plugins::input::types::{Action, InputData, InputMap}, map::json_types::Dimension};
+use crate::{plugins::input::types::{Action, InputData, InputMap}};
+use map_shared::Dimension;
 
 use super::{systems::{PlayerPosition, FullScreen}, engine::{GameData, SizeDate}, dimension::DimensionHandle, tutorial::Tutorial, shader::DimensionMaterial};
 

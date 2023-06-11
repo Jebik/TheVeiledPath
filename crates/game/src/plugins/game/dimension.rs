@@ -3,7 +3,7 @@ use super::{
     map::{ItemType, Door, Key},
     systems::{PlayerPosition, GameEntity, DoorId}, shader::{DimensionMaterial, ShaderData},
 };
-use crate::map::json_types::Dimension;
+use map_shared::Dimension;
 use bevy::{
     core_pipeline::clear_color::ClearColorConfig,
     prelude::{

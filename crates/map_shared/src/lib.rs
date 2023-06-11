@@ -1,9 +1,32 @@
+use std::str::FromStr;
+
 use serde::{Deserialize, Serialize};
 
 #[derive(Deserialize, Serialize, Clone, Copy, Debug)]
 pub enum Dimension {
     Light,
     Dark,
+}
+
+impl FromStr for Dimension {
+    type Err = ();
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "light" => Ok(Dimension::Light),
+            "dark" => Ok(Dimension::Dark),
+            _ => Err(()),
+        }
+    }
+}
+
+impl Dimension {
+    pub fn switch_dimension(&mut self) {
+        match self {
+            Dimension::Light => *self = Dimension::Dark,
+            Dimension::Dark => *self = Dimension::Light,
+        }
+    }
 }
 
 #[derive(Deserialize, Serialize)]
