@@ -1,0 +1,82 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug executable 'the_veiled_path'",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--bin=the_veiled_path",
+                    "--package=the_veiled_path"
+                ],
+                "filter": {
+                    "name": "the_veiled_path",
+                    "kind": "bin"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in executable 'the_veiled_path'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--bin=the_veiled_path",
+                    "--package=the_veiled_path"
+                ],
+                "filter": {
+                    "name": "the_veiled_path",
+                    "kind": "bin"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug example 'ldtk'",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--example=ldtk",
+                    "--package=the_veiled_path"
+                ],
+                "filter": {
+                    "name": "ldtk",
+                    "kind": "example"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in example 'ldtk'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--example=ldtk",
+                    "--package=the_veiled_path"
+                ],
+                "filter": {
+                    "name": "ldtk",
+                    "kind": "example"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        }
+    ]
+}

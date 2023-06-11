@@ -1,12 +1,12 @@
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
-#[derive(Deserialize, Clone, Copy, Debug)]
+#[derive(Deserialize, Serialize, Clone, Copy, Debug)]
 pub enum Dimension {
     Light,
     Dark,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Serialize)]
 pub struct MapData {
     pub name: String,
     pub size: i32,
@@ -19,14 +19,14 @@ pub struct MapData {
     pub keys: Vec<Key>,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Serialize)]
 pub struct Wall {
     pub x: i32,
     pub y: i32,
     pub dimension: Dimension,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Serialize)]
 pub struct Door {
     pub x: i32,
     pub y: i32,
@@ -34,7 +34,7 @@ pub struct Door {
     pub dimension: Dimension,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Serialize)]
 pub struct Key {
     pub x: i32,
     pub y: i32,
