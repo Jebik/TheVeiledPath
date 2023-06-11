@@ -1,7 +1,7 @@
 mod map;
 mod plugins;
 
-use bevy::prelude::*;
+use bevy::{prelude::*, diagnostic::{LogDiagnosticsPlugin, FrameTimeDiagnosticsPlugin}};
 use map::parser::{parse_map, MapSource, MapFile};
 use plugins::plugin::StatePlugin;
 use map::map_manager::MapManager;
@@ -27,5 +27,7 @@ fn main() {
     App::new()
     .insert_resource::<MapManager>(map_manager)
     .add_plugin(StatePlugin)
+    .add_plugin(LogDiagnosticsPlugin::default())
+    .add_plugin(FrameTimeDiagnosticsPlugin::default())
     .run();
 }
