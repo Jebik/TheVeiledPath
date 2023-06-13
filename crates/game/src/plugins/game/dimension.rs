@@ -1,9 +1,9 @@
 use super::{
     engine::{GameData, SizeDate},
     map::{ItemType, Door, Key},
-    systems::{PlayerPosition, GameEntity, DoorId}, shader::{DimensionMaterial, ShaderData},
+    systems::{PlayerPosition, GameEntity, DoorId, FollowPlayerPosition}, shader::{DimensionMaterial, ShaderData},
 };
-use crate::map::json_types::Dimension;
+use map_shared::Dimension;
 use bevy::{
     core_pipeline::clear_color::ClearColorConfig,
     prelude::{
@@ -131,7 +131,7 @@ pub fn init_dimension_world(
     let mut camera = Camera2dBundle::default();
     camera.camera.target = RenderTarget::Image(image_handle);
     camera.camera_2d.clear_color = ClearColorConfig::Custom(Color::rgba(0., 0., 0., 0.));
-    commands.spawn((camera, render_layer)).insert(GameEntity);
+    commands.spawn((camera, render_layer, GameEntity, FollowPlayerPosition));
 
     let (dimension_cells, other_cells) = match dimension {
         Dimension::Light => (&mut game_data.map.light_cells, &mut game_data.map.dark_cells),

@@ -1,5 +1,5 @@
 use bevy::prelude::{warn, Entity, Commands, Query};
-use crate::map::json_types::{Dimension, MapData};
+use map_shared::{Dimension, MapData};
 
 use super::systems::DoorId;
 
