@@ -13,7 +13,7 @@ use bevy::{
     ecs::system::{Commands, Res},
     prelude::{
         default, info, shape, Assets, Camera2dBundle, Component, Entity, EventReader, Image, Mesh,
-        Query, ResMut, Vec2, With,
+        Query, ResMut, Vec2, With, Transform, Without, Vec3,
     },
     render::render_resource::{
         Extent3d, TextureDescriptor, TextureDimension, TextureFormat, TextureUsages,
@@ -77,6 +77,9 @@ pub fn setup_game(
     commands.insert_resource(tutorial);
     commands.insert_resource(size_data);
 }
+
+#[derive(Component)]
+pub struct FollowPlayerPosition;
 
 #[derive(Component)]
 pub struct PlayerPosition;
@@ -165,7 +168,7 @@ fn spawn_full_screen_quad(
 
     let mut camera = Camera2dBundle::default();    
     camera.camera_2d.clear_color = ClearColorConfig::Custom(clear_color);
-    commands.spawn(camera)
+    commands.spawn(camera).insert(FollowPlayerPosition)
     .insert(FullScreen)
     .insert(GameEntity);
     // Create the quad mesh
@@ -180,10 +183,11 @@ fn spawn_full_screen_quad(
         .spawn(MaterialMesh2dBundle {
             material: shader_handle,
             mesh: mesh,
+            transform: Transform::from_translation(Vec3::new(0f32, 0f32, 1f32)),
             ..Default::default()
         })
         .insert(FullScreen)
-        .insert(GameEntity);
+        .insert(GameEntity).insert(FollowPlayerPosition);
 }
 
 pub fn window_resize_system(
@@ -192,6 +196,7 @@ pub fn window_resize_system(
     mut resize_reader: EventReader<WindowResized>,
     mut query: Query<&mut Mesh2dHandle, With<FullScreen>>,
 ) {
+    /* 
     for e in resize_reader.iter() {
         info!("Window was resized to {} x {}", e.width, e.height);
         size_data.screen_w = e.width;
@@ -207,5 +212,15 @@ pub fn window_resize_system(
                 .into();
             *mesh_handle = mesh;
         }
+    }*/
+}
+
+pub fn follow_player_position(player_position: Query<&Transform, (With<PlayerPosition>, Without<FollowPlayerPosition>)>, mut followers: Query<&mut Transform, With<FollowPlayerPosition>>) {
+    let Some(player_position) = player_position.iter().next() else {
+        return;
+    };
+    for mut t in followers.iter_mut() {
+        t.translation.x = player_position.translation.x;
+        t.translation.y = player_position.translation.y;
     }
 }

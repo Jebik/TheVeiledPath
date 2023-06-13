@@ -26,9 +26,8 @@ fn fragment(in: FragmentInput
     let world_color = textureSample(texture, txt_sampler, in.uv);
     var final_color = data.color;
     // Transform uv coordinates to world space
-    var uv_world = in.uv * data.size_info;    
-    // Correct for the 0.5 offset
-    uv_world -= vec2<f32>(0.5, 0.5);
+    var uv_world = (in.uv - vec2<f32>(0.5, 0.5)) * data.size_info;    
+
 
     let player_distance = distance(data.player_position, uv_world);
     let goal_distance = distance(data.goal_position, uv_world);
@@ -52,6 +51,5 @@ fn fragment(in: FragmentInput
         // Blend the final color with the light color based on the blend factor
         final_color = mix(final_color, world_color, blend_factor);
     }
-
     return final_color;
 }

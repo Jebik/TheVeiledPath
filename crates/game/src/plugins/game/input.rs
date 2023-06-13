@@ -66,11 +66,11 @@ pub fn move_system(
         let dark_handle = dimension.get_shader_handle(Dimension::Dark);
 
         let light_material = materials.get_mut(&light_handle).unwrap();
-        light_material.shader_data.player_position = Vec2::new(game_data.player.x, game_data.player.y);
+        light_material.shader_data.player_position = Vec2::ZERO;//Vec2::new(game_data.player.x, game_data.player.y);
         light_material.shader_data.player_direction = Vec2::new(game_data.player.dir_x, game_data.player.dir_y);
 
         let dark_material = materials.get_mut(&dark_handle).unwrap();
-        dark_material.shader_data.player_position = Vec2::new(game_data.player.x, game_data.player.y);
+        dark_material.shader_data.player_position = Vec2::ZERO;//Vec2::new(game_data.player.x, game_data.player.y);
         dark_material.shader_data.player_direction = Vec2::new(game_data.player.dir_x, game_data.player.dir_y);
 
         if input_data.button_a {
