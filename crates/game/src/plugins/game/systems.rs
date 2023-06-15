@@ -4,8 +4,9 @@ use super::{
     shader::DimensionMaterial,
     tutorial::{init_tuto, Tutorial},
 };
+use map_shared::Dimension;
 use crate::{
-    map::{json_types::Dimension, map_manager::MapManager},
+    map::map_manager::MapManager,
     plugins::{game::engine::SizeDate, menu::plugin::LevelChoice},
 };
 use bevy::{

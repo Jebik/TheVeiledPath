@@ -1,14 +1,10 @@
-mod map;
-mod plugins;
+use game::*;
 
-use bevy::prelude::*;
+use bevy::{prelude::*, diagnostic::{LogDiagnosticsPlugin, FrameTimeDiagnosticsPlugin}};
 use map::parser::{parse_map, MapSource, MapFile};
 use plugins::plugin::StatePlugin;
 use map::map_manager::MapManager;
 use std::{env, path::PathBuf};
-
-
-impl Resource for MapManager {}
 
 fn main() {
     // Get the command line arguments.
@@ -27,5 +23,7 @@ fn main() {
     App::new()
     .insert_resource::<MapManager>(map_manager)
     .add_plugin(StatePlugin)
+    .add_plugin(LogDiagnosticsPlugin::default())
+    .add_plugin(FrameTimeDiagnosticsPlugin::default())
     .run();
 }

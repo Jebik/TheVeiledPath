@@ -1,19 +1,8 @@
 use std::path::PathBuf;
 use std::{fs, error::Error, str::FromStr};
 
-use crate::map::json_types::{Dimension, MapData};
+use map_shared::{Dimension, MapData};
 
-impl FromStr for Dimension {
-    type Err = ();
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "light" => Ok(Dimension::Light),
-            "dark" => Ok(Dimension::Dark),
-            _ => Err(()),
-        }
-    }
-}
 pub enum MapFile {
     Level,
     Tuto,
